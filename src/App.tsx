@@ -25,9 +25,13 @@ function App() {
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <h1 className="text-3xl font-bold underline">Hello world!</h1>
+      <p className="text-sky-400">The quick brown fox...</p>
+      <div className="rounded border-4 border-indigo-500/100">00</div>
+      <div className="rounded-md">11</div>
+      <div className="rounded-lg">22</div>
+      <div className="rounded-full">33</div>
+      <button className="... ring-2 ring-blue-500">Create account</button>
     </>
   );
 }

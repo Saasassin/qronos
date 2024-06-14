@@ -27,10 +27,13 @@ function App() {
       </div>
       <h1 className="text-3xl font-bold underline">Hello world!</h1>
       <p className="text-sky-400">The quick brown fox...</p>
-      <div className="rounded border-4 border-indigo-500/100">00</div>
-      <div className="rounded-md">11</div>
-      <div className="rounded-lg">22</div>
-      <div className="rounded-full">33</div>
+      <div className="grid grid-cols-4 gap-4">
+        <div className="border-solid border-2 border-sky-500 ">1111</div>
+        <div className="border-dashed border-2 border-sky-500">222</div>
+        <div className="border-dotted border-2 border-sky-500">333</div>
+        <div className="border-double border-4 border-sky-500 ">444</div>
+      </div>
+      <div className="flex justify-center space-x-4">&nbsp;</div>
       <button className="... ring-2 ring-blue-500">Create account</button>
     </>
   );

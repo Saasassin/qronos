@@ -1,22 +1,42 @@
 # Qronos
 
-Repository for Qronos application - a self-hosted script runner
+Repository for Qronos application - a self-hosted script runner.
 
-## Developer Installation
+## Frontend
 
-- Clone the repository
-- [Install pnpm](https://pnpm.io/installation)
-- Run `pnpm install`
-- Run `pnpm run dev` to start the development server
-- Open [http://localhost:4000](http://localhost:4000) in your browser
+The frontend is in [./frontend](frontend) and is currently built with `pnpm` and `vite`. This will need to be added to the bazel build so we can bundle the frontend/backend together in a single artifact, but they're separate for now.
 
-### Developer Notes:
+## Prerequisites
 
-Some handy VCSode extensions:
+- [Bazelisk](https://github.com/bazelbuild/bazelisk/tree/master?tab=readme-ov-file#installation)
+- [pnpm](https://pnpm.io/installation)
 
-- [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
-- [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)
-- [PostCSS Language Support](https://marketplace.visualstudio.com/items?itemName=csstools.postcss)
-- [Vite](https://marketplace.visualstudio.com/items?itemName=antfu.vite)
+## IDE
 
-:: The included `launch.json` file is configured to run the development server in debug mode and will allow you to set breakpoints and still run the server at http://localhost:4000.
+### Scala
+
+- [Metals](https://scalameta.org/metals/docs/editors/vscode/)
+
+This is all you need for basic intellisense and syntax highlighting. If you're having trouble with auto imports after importing the project, try running `bazel run //:bazel_bsp` and restarting metals or your editor.
+
+### JS/TS
+
+There's a list of handy extensions in the [frontend README](frontend/README.md).
+
+## Build Everything
+
+```bash
+bazel build //...
+```
+
+## Run Backend
+
+```bash
+bazel run //backend/akka
+```
+
+## Adding JVM dependencies
+
+Add to the `artifacts` list in the `MODULE.bzl` file.
+
+Run `REPIN=1 bazel run @mvn//:pin` to update the lockfile `maven_install.json`.

@@ -19,4 +19,8 @@ Some handy VCSode extensions:
 - [PostCSS Language Support](https://marketplace.visualstudio.com/items?itemName=csstools.postcss)
 - [Vite](https://marketplace.visualstudio.com/items?itemName=antfu.vite)
 
-:: The included `launch.json` file is configured to run the development server in debug mode and will allow you to set breakpoints and still run the server at http://localhost:4000.
+### Debugging in VSCode:
+
+The included `launch.json` file is configured to run the development server in debug mode and will allow you to set breakpoints and still run the server at http://localhost:4000.
+
+You can either run the server from command line first using `pnpm run dev` and then run the `chrome_frontend` configuration in the debugger, or you can run the `Webapp::Chrome` configuration which will start the server and attach the debugger.

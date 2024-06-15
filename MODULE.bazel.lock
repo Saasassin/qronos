@@ -6200,7 +6200,7 @@
     "@@rules_oci~//oci:extensions.bzl%oci": {
       "general": {
         "bzlTransitiveDigest": "tD+SFENvOPcKVT3au+nAbtKfFVzD0+MbFp/tbFgKTs4=",
-        "usagesDigest": "qgMdkfcKhl+kJ+vAOi+60vbGtgnualvmkNI38VA6wU0=",
+        "usagesDigest": "DOxrKjHiUNH+GAB3PheOQkuQvYJHla6FuDjb95w/tn0=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -6367,6 +6367,23 @@
               "version": "1.7"
             }
           },
+          "graalvm_22_oci": {
+            "bzlFile": "@@rules_oci~//oci/private:pull.bzl",
+            "ruleClassName": "oci_alias",
+            "attributes": {
+              "target_name": "graalvm_22_oci",
+              "scheme": "https",
+              "registry": "ghcr.io",
+              "repository": "graalvm/jdk-community",
+              "identifier": "sha256:bfe024278c3189370950e19e1c6bc9048b93f0655ab32c5914e514e745875560",
+              "platforms": {
+                "@@platforms//cpu:x86_64": "@graalvm_22_oci_linux_amd64",
+                "@@platforms//cpu:arm64": "@graalvm_22_oci_linux_arm64"
+              },
+              "bzlmod_repository": "graalvm_22_oci",
+              "reproducible": true
+            }
+          },
           "yq_darwin_amd64": {
             "bzlFile": "@@aspect_bazel_lib~//lib/private:yq_toolchain.bzl",
             "ruleClassName": "yq_platform_repo",
@@ -6381,6 +6398,18 @@
             "attributes": {
               "platform": "linux_i386",
               "crane_version": "v0.18.0"
+            }
+          },
+          "graalvm_22_oci_linux_amd64": {
+            "bzlFile": "@@rules_oci~//oci/private:pull.bzl",
+            "ruleClassName": "oci_pull",
+            "attributes": {
+              "scheme": "https",
+              "registry": "ghcr.io",
+              "repository": "graalvm/jdk-community",
+              "identifier": "sha256:bfe024278c3189370950e19e1c6bc9048b93f0655ab32c5914e514e745875560",
+              "platform": "linux/amd64",
+              "target_name": "graalvm_22_oci_linux_amd64"
             }
           },
           "oci_crane_windows_armv6": {
@@ -6479,6 +6508,18 @@
             "ruleClassName": "copy_to_directory_platform_repo",
             "attributes": {
               "platform": "linux_amd64"
+            }
+          },
+          "graalvm_22_oci_linux_arm64": {
+            "bzlFile": "@@rules_oci~//oci/private:pull.bzl",
+            "ruleClassName": "oci_pull",
+            "attributes": {
+              "scheme": "https",
+              "registry": "ghcr.io",
+              "repository": "graalvm/jdk-community",
+              "identifier": "sha256:bfe024278c3189370950e19e1c6bc9048b93f0655ab32c5914e514e745875560",
+              "platform": "linux/arm64",
+              "target_name": "graalvm_22_oci_linux_arm64"
             }
           },
           "coreutils_linux_amd64": {
@@ -6673,7 +6714,8 @@
         "moduleExtensionMetadata": {
           "explicitRootModuleDirectDeps": [
             "bookworm_slim",
-            "distroless_base"
+            "distroless_base",
+            "graalvm_22_oci"
           ],
           "explicitRootModuleDirectDevDeps": [],
           "useAllRepos": "NO",

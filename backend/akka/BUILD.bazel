@@ -56,20 +56,17 @@ native_image(
 )
 
 tar(
-    name = "main_tar_linux",
-    srcs = [":main"],
-    target_compatible_with = ["@platforms//os:linux"],
+    name = "main_tar",
+    srcs = [":main_deploy.jar"],
+    tags = ["manual"],
 )
 
-# Doesn't work with the GraalVM JDK unfortunately because
-# their toolchain doesn't specify platform constraints...
-# We should fix that, but for now just use `--config=java21`
 oci_image(
     name = "main_oci",
-    base = "@bookworm_slim",
-    entrypoint = ["./main"],
+    base = "@graalvm_22_oci",
+    entrypoint = ["java", "-jar", "main_deploy.jar"],
     tags = ["manual"],
-    tars = [":main_tar_linux"],
+    tars = [":main_tar"],
     workdir = "/" + package_name(),
 )
 

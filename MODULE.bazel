@@ -166,5 +166,16 @@ oci.pull(
     ],
 )
 
+oci.pull(
+    name = "graalvm_22_oci",
+    digest = "sha256:bfe024278c3189370950e19e1c6bc9048b93f0655ab32c5914e514e745875560",
+    image = "ghcr.io/graalvm/jdk-community:22.0.1",
+    platforms = [
+        "linux/amd64",
+        "linux/arm64",
+    ],
+)
+
 use_repo(oci, "bookworm_slim")
 use_repo(oci, "distroless_base")
+use_repo(oci, "graalvm_22_oci")

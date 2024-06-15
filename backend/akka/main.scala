@@ -59,12 +59,12 @@ object ActorHierarchyMain extends App {
         cpuLimit = "1.0",
         memoryLimit = "512m",
         maxRuntime = 60.seconds,
-        stdoutFile = os.Path(
-          env.getOrElse("BUILD_WORKSPACE_DIRECTORY", ".")
-        ) / "docker_output.log",
-        stderrFile = os.Path(
-          env.getOrElse("BUILD_WORKSPACE_DIRECTORY", ".")
-        ) / "docker_error.log"
+        stdoutFile =
+          env.get("BUILD_WORKSPACE_DIRECTORY").map(os.Path(_)).getOrElse(os.pwd)
+            / "docker_output.log",
+        stderrFile =
+          env.get("BUILD_WORKSPACE_DIRECTORY").map(os.Path(_)).getOrElse(os.pwd)
+            / "docker_error.log",
       ),
       "docker-monitor"
     )

@@ -8,3 +8,4 @@
 projectview.bazelproject
 
 node_modules/
+dist/

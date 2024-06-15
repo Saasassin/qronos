@@ -4,6 +4,9 @@
   "description": "",
   "scripts": {},
   "keywords": [],
+  "pnpm": {
+    "onlyBuiltDependencies": []
+  },
   "author": "",
   "license": "ISC"
 }

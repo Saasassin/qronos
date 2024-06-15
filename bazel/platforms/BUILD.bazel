@@ -1,0 +1,10 @@
+load(":const.bzl", "PLATFORMS")
+
+[
+    platform(
+        name = name,
+        constraint_values = p.constraint_values,
+        visibility = ["//visibility:public"],
+    )
+    for name, p in PLATFORMS.items()
+]

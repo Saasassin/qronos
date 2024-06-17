@@ -16,7 +16,6 @@ vite.vite(
         "--mode",
         "production",
     ],
-    out_dirs = ["dist"],
     chdir = package_name(),
+    out_dirs = ["dist"],
 )
-

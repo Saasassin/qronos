@@ -20,9 +20,64 @@ import concurrent.duration.DurationInt
 import scala.jdk.DurationConverters._
 import scala.jdk.CollectionConverters._
 import dockermonitor.DockerMonitor
+import org.apache.pekko.actor.typed.SupervisorStrategy
+
+object Server {
+}
+
+object RootActor {
+  def apply(): Behavior[Nothing] = Behaviors.setup[Nothing] { context =>
+    given ActorSystem[_] = context.system
+
+    val route: Route =
+      path("hello") {
+        get {
+          complete(
+            HttpEntity(
+              ContentTypes.`text/html(UTF-8)`,
+              "<h1>Say hello to Pekko HTTP</h1>"
+            )
+          )
+        }
+      }
+
+    val host = "localhost"
+    val port = 8080
+    val url = s"http://$host:$port/hello"
+
+    val bindingFuture = Http().newServerAt(host, port).bind(route)
+    val env = System.getenv().asScala
+    val monitor = context.spawn(
+      Behaviors
+        .supervise[DockerMonitor.Command](
+          DockerMonitor(
+            imageName = "ubuntuu:latest",
+            cpuLimit = "1.0",
+            memoryLimit = "512m",
+            maxRuntime = 60.seconds,
+            stdoutFile = env
+              .get("BUILD_WORKSPACE_DIRECTORY")
+              .map(os.Path(_))
+              .getOrElse(os.pwd)
+              / "docker_output.log",
+            stderrFile = env
+              .get("BUILD_WORKSPACE_DIRECTORY")
+              .map(os.Path(_))
+              .getOrElse(os.pwd)
+              / "docker_error.log"
+          )
+        )
+        .onFailure[Throwable](SupervisorStrategy.restart),
+      "docker-monitor"
+    )
+    context.watch(monitor)
+    monitor ! DockerMonitor.Start
+    Behaviors.empty
+  }
+}
 
 object ActorHierarchyMain extends App {
-  given system: ActorSystem[_] = ActorSystem(Behaviors.empty, "main")
+  given system: ActorSystem[_] = ActorSystem(RootActor(), "main")
   given executionContext: ExecutionContext = system.executionContext
 
   println(
@@ -32,44 +87,26 @@ object ActorHierarchyMain extends App {
   println(s"JVM vendor: ${System.getProperty("java.vendor")}")
   println(s"JVM version: ${System.getProperty("java.version")}")
 
-  val route: Route =
-    path("hello") {
-      get {
-        complete(
-          HttpEntity(
-            ContentTypes.`text/html(UTF-8)`,
-            "<h1>Say hello to Pekko HTTP</h1>"
-          )
-        )
-      }
-    }
+  // val env = System.getenv().asScala
 
-  val host = "localhost"
-  val port = 8080
-  val url = s"http://$host:$port/hello"
+  // val monitor =
+  //   system.systemActorOf(
+  //     DockerMonitor(
+  //       imageName = "ubuntu:latest",
+  //       cpuLimit = "1.0",
+  //       memoryLimit = "512m",
+  //       maxRuntime = 60.seconds,
+  //       stdoutFile =
+  //         env.get("BUILD_WORKSPACE_DIRECTORY").map(os.Path(_)).getOrElse(os.pwd)
+  //           / "docker_output.log",
+  //       stderrFile =
+  //         env.get("BUILD_WORKSPACE_DIRECTORY").map(os.Path(_)).getOrElse(os.pwd)
+  //           / "docker_error.log",
+  //     ),
+  //     "docker-monitor"
+  //   )
 
-  val bindingFuture = Http().newServerAt(host, port).bind(route)
-
-  val env = System.getenv().asScala
-
-  val monitor =
-    system.systemActorOf(
-      DockerMonitor(
-        imageName = "ubuntu:latest",
-        cpuLimit = "1.0",
-        memoryLimit = "512m",
-        maxRuntime = 60.seconds,
-        stdoutFile =
-          env.get("BUILD_WORKSPACE_DIRECTORY").map(os.Path(_)).getOrElse(os.pwd)
-            / "docker_output.log",
-        stderrFile =
-          env.get("BUILD_WORKSPACE_DIRECTORY").map(os.Path(_)).getOrElse(os.pwd)
-            / "docker_error.log",
-      ),
-      "docker-monitor"
-    )
-
-  monitor ! DockerMonitor.Start
+  // monitor ! DockerMonitor.Start
 
   println(
     s"Server now online. Please navigate to ${url}\nPress RETURN to stop..."

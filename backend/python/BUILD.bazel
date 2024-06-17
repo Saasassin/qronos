@@ -1,0 +1,47 @@
+# gazelle:map_kind py_library py_library @aspect_rules_py//py:defs.bzl
+# gazelle:map_kind py_binary py_binary @aspect_rules_py//py:defs.bzl
+# gazelle:map_kind py_test py_test @aspect_rules_py//py:defs.bzl
+# gazelle:python_root
+# gazelle:exclude .main.venv
+
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
+load("@pip//:requirements.bzl", "all_whl_requirements")
+load("@rules_python//python/pip_install:requirements.bzl", "compile_pip_requirements")
+load("//bazel:python.bzl", "py_setup_gazelle")
+
+compile_pip_requirements(
+    name = "requirements",
+    extra_args = ["--allow-unsafe"],
+    requirements_in = "requirements.in",
+    requirements_txt = "requirements.txt",
+)
+
+py_setup_gazelle(
+    all_whl_requirements = all_whl_requirements,
+    requirements_lock = "requirements.txt",
+)
+
+py_binary(
+    name = "main",
+    srcs = ["main.py"],
+    data = [".env"],
+    visibility = ["//backend/python:__subpackages__"],
+    deps = [
+        "//backend/python/qronos",
+        "@pip//fastapi",
+        "@pip//pydantic",
+        "@pip//uvicorn",
+    ],
+)
+
+py_library(
+    name = "python",
+    srcs = ["main.py"],
+    visibility = ["//backend/python:__subpackages__"],
+    deps = [
+        "//backend/python/qronos",
+        "@pip//fastapi",
+        "@pip//pydantic",
+        "@pip//uvicorn",
+    ],
+)

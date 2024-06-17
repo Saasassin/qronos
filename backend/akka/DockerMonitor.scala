@@ -15,6 +15,7 @@ import org.apache.pekko.actor.typed.PostStop
 import java.io.BufferedOutputStream
 import java.io.FileOutputStream
 import scala.concurrent.duration.FiniteDuration
+import org.apache.pekko.actor.typed.PreRestart
 
 object DockerMonitor {
   def apply(
@@ -131,7 +132,7 @@ class DockerMonitor(
               if (p.exitCode() == 0) {
                 context.log.info(s"Process exited with 0")
               } else {
-                context.log.error(s"Process exited with ${p.exitCode()}")
+                throw new RuntimeException(s"Process exited with ${p.exitCode()}")
               }
               context.self ! Stop
             }
@@ -140,6 +141,10 @@ class DockerMonitor(
         this
 
   override def onSignal: PartialFunction[Signal, Behavior[Command]] =
+    case PreRestart =>
+      context.log.info(s"Restarting Docker container: $imageName")
+      context.self ! Start
+      this
     case PostStop =>
       process.foreach(_.destroy())
       stdoutFileWriter.close()

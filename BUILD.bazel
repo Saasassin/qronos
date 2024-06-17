@@ -1,3 +1,4 @@
+load("@bazel_gazelle//:def.bzl", "gazelle")
 load("@io_bazel_rules_scala//scala:scala_toolchain.bzl", "scala_toolchain")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 
@@ -31,4 +32,14 @@ toolchain(
     toolchain = "semanticdb_toolchain_impl",
     toolchain_type = "@io_bazel_rules_scala//scala:toolchain_type",
     visibility = ["//visibility:public"],
+)
+
+# Our gazelle target points to the python gazelle binary.
+# This is the simple case where we only need one language supported.
+# If you also had proto, go, or other gazelle-supported languages,
+# you would also need a gazelle_binary rule.
+# See https://github.com/bazelbuild/bazel-gazelle/blob/master/extend.rst#example
+gazelle(
+    name = "gazelle",
+    gazelle = "@rules_python_gazelle_plugin//python:gazelle_binary",
 )

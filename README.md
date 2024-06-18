@@ -1,6 +1,6 @@
 # Qronos
 
-Repository for Qronos application - a self-hosted script runner.
+Qronos is a self-hosted application for running and monitoring scripts written in Javacript and Python. Write scripts that act as APIs, scheduled tasks, webhooks, and more.
 
 ## Frontend
 

@@ -1,6 +1,6 @@
 # Qronos Frontend
 
-This is the frontend for the Qronos application. It is built using [Vite](https://vitejs.dev) and [React](https://reactjs.org).
+This is the frontend for the Qronos application. It is built using [Vite](https://vitejs.dev) and [React](https://reactjs.org) with [Tailwind CSS](https://tailwindcss.com) for styling.
 
 ## Developer Installation
 

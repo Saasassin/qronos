@@ -3,6 +3,15 @@
 @tailwind utilities;
 
 :root {
+  @apply bg-gray-900 dark:text-slate-400 antialiased;
+}
+
+relative {
+  position: relative;
+}
+
+/* 
+:root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -69,4 +78,4 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
+} */

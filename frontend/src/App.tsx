@@ -1,12 +1,16 @@
 import { useState } from "react";
+import Footer from "./components/layouts/footer";
+import Header from "./components/layouts/header";
+
 // import reactLogo from "./assets/react.svg";
 // import viteLogo from "/vite.svg";
 
-function App() {
+const App = () => {
   const [count, setCount] = useState(0);
 
   return (
     <>
+      <Header />
       <h1>Vite + React</h1>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
@@ -47,8 +51,9 @@ function App() {
           including upside-down. It even works in outer space.
         </p>
       </div>
+      <Footer />
     </>
   );
-}
+};
 
 export default App;

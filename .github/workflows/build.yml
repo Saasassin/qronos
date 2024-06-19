@@ -35,13 +35,14 @@ jobs:
         with:
           path: |
             ./.bazel-cache/
-          key: ${{ matrix.os }}-bazel-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}-
+          key: ${{ matrix.os }}-bazel-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}-${{ github.run_id }}
           restore-keys: |
             ${{ matrix.os }}-bazel-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}-
+            ${{ matrix.os }}-bazel-refs/heads/main-
             ${{ matrix.os }}-bazel-
 
       - name: Build all targets
         run: bazel build //...
-        
+
       - name: Test all targets
         run: bazel test //...

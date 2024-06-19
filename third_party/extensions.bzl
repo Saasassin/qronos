@@ -11,6 +11,11 @@ V8_RELEASES = {
         sha256 = "835519d5cf627c9218352164e9b2856942ddf793c804c9bc1d3721e9de2db7f6",
         urls = ["https://github.com/denoland/rusty_v8/releases/download/v0.94.0/librusty_v8_release_x86_64-apple-darwin.a.gz"],
     ),
+    "aarch64-apple-darwin": struct(
+        downloaded_file_path = "librusty_v8_release_aarch64-apple-darwin.a.gz",
+        sha256 = "346cdabc76e30190084b7c6cfc9e03f1d42324137ee61152ae52fac1b48d1b63",
+        urls = ["https://github.com/denoland/rusty_v8/releases/download/v0.94.0/librusty_v8_debug_aarch64-apple-darwin.a.gz"],
+    ),
 }
 
 def _third_party(_mctx):

@@ -21,31 +21,12 @@ import scala.jdk.DurationConverters._
 import scala.jdk.CollectionConverters._
 import dockermonitor.DockerMonitor
 import org.apache.pekko.actor.typed.SupervisorStrategy
+import scala.concurrent.Await
 
-object Server {
-}
+object Server {}
 
 object RootActor {
   def apply(): Behavior[Nothing] = Behaviors.setup[Nothing] { context =>
-    given ActorSystem[_] = context.system
-
-    val route: Route =
-      path("hello") {
-        get {
-          complete(
-            HttpEntity(
-              ContentTypes.`text/html(UTF-8)`,
-              "<h1>Say hello to Pekko HTTP</h1>"
-            )
-          )
-        }
-      }
-
-    val host = "localhost"
-    val port = 8080
-    val url = s"http://$host:$port/hello"
-
-    val bindingFuture = Http().newServerAt(host, port).bind(route)
     val env = System.getenv().asScala
     val monitor = context.spawn(
       Behaviors
@@ -87,30 +68,28 @@ object ActorHierarchyMain extends App {
   println(s"JVM vendor: ${System.getProperty("java.vendor")}")
   println(s"JVM version: ${System.getProperty("java.version")}")
 
-  // val env = System.getenv().asScala
+  val route: Route =
+    path("hello") {
+      get {
+        complete(
+          HttpEntity(
+            ContentTypes.`text/html(UTF-8)`,
+            "<h1>Say hello to Pekko HTTP</h1>"
+          )
+        )
+      }
+    }
 
-  // val monitor =
-  //   system.systemActorOf(
-  //     DockerMonitor(
-  //       imageName = "ubuntu:latest",
-  //       cpuLimit = "1.0",
-  //       memoryLimit = "512m",
-  //       maxRuntime = 60.seconds,
-  //       stdoutFile =
-  //         env.get("BUILD_WORKSPACE_DIRECTORY").map(os.Path(_)).getOrElse(os.pwd)
-  //           / "docker_output.log",
-  //       stderrFile =
-  //         env.get("BUILD_WORKSPACE_DIRECTORY").map(os.Path(_)).getOrElse(os.pwd)
-  //           / "docker_error.log",
-  //     ),
-  //     "docker-monitor"
-  //   )
+  val host = "localhost"
+  val port = 8080
+  val url = s"http://$host:$port/hello"
 
-  // monitor ! DockerMonitor.Start
+  val bindingFuture = Http().newServerAt(host, port).bind(route)
 
   println(
     s"Server now online. Please navigate to ${url}\nPress RETURN to stop..."
   )
+
   StdIn.readLine() // let it run until user presses return
   bindingFuture
     .flatMap(_.unbind()) // trigger unbinding from the port

@@ -5,7 +5,7 @@ common --enable_platform_specific_config
 startup --host_jvm_args=-DBAZEL_TRACK_SOURCE_DIRECTORIES=1
 # ^ rules_js needs this for now: https://github.com/aspect-build/rules_js/issues/1408
 build --experimental_remote_merkle_tree_cache
-build --experimental_remote_merkle_tree_cache_size=10000
+build --experimental_remote_merkle_tree_cache_size=100000
 build:unix --incompatible_strict_action_env
 # ^ https://blog.aspect.build/bazelrc-flags
 

@@ -38,7 +38,6 @@ jobs:
           key: ${{ matrix.os }}-bazel-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}-
           restore-keys: |
             ${{ matrix.os }}-bazel-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}-
-            ${{ matrix.os }}-bazel-refs/head/main-
             ${{ matrix.os }}-bazel-
 
       - name: Build all targets

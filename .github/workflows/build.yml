@@ -16,9 +16,6 @@ jobs:
         os: [ubuntu-20.04, macos-14]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
         if: ${{ matrix.os == 'ubuntu-20.04' }}
@@ -26,6 +23,9 @@ jobs:
           root-reserve-mb: 512
           swap-size-mb: 1024
           remove-dotnet: "true"
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
       - name: Set up Bazel cache
         uses: actions/cache@v2

@@ -1,19 +1,26 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
-def _third_party(_mctx):
-    http_file(
-        name = "librusty_v8_release_x86_64-unknown-linux-gnu",
-        downloaded_file_path = "librusty_v8_release_x86_64-unknown-linux-gnu.a",
-        sha256 = "d25d394167d62021534ad07401518c033076f0c14e7b8907ed8e664fa0b1bc67",
-        urls = ["https://github.com/denoland/rusty_v8/releases/download/v0.44.3/librusty_v8_release_x86_64-unknown-linux-gnu.a"],
-    )
+V8_RELEASES = {
+    "x86_64-unknown-linux-gnu": struct(
+        downloaded_file_path = "librusty_v8_release_x86_64-unknown-linux-gnu.a.gz",
+        sha256 = "a069673edf5bac694787371c6eef2d3a2a66ea88b2e18c8951bcac0fd2271bbc",
+        urls = ["https://github.com/denoland/rusty_v8/releases/download/v0.94.0/librusty_v8_release_x86_64-unknown-linux-gnu.a.gz"],
+    ),
+    "x86_64-apple-darwin": struct(
+        downloaded_file_path = "librusty_v8_release_x86_64-apple-darwin.a.gz",
+        sha256 = "835519d5cf627c9218352164e9b2856942ddf793c804c9bc1d3721e9de2db7f6",
+        urls = ["https://github.com/denoland/rusty_v8/releases/download/v0.94.0/librusty_v8_release_x86_64-apple-darwin.a.gz"],
+    ),
+}
 
-    http_file(
-        name = "librusty_v8_release_x86_64-apple-darwin",
-        downloaded_file_path = "librusty_v8_release_x86_64-apple-darwin.a",
-        sha256 = "7f4941adac98368ee2bc2a9e25c605e443049e6ae01fea872e87cccdb509f8eb",
-        urls = ["https://github.com/denoland/rusty_v8/releases/download/v0.44.3/librusty_v8_release_x86_64-apple-darwin.a"],
-    )
+def _third_party(_mctx):
+    for platform, info in V8_RELEASES.items():
+        http_file(
+            name = "librusty_v8_release_{platform}".format(platform = platform),
+            downloaded_file_path = info.downloaded_file_path,
+            sha256 = info.sha256,
+            urls = info.urls,
+        )
 
 third_party = module_extension(
     implementation = _third_party,

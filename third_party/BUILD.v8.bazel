@@ -1,3 +1,5 @@
+load("@@rules_gzip~//gzip/decompress:defs.bzl", "gzip_decompress")
+
 config_setting(
     name = "linux",
     constraint_values = ["@platforms//os:linux"],
@@ -8,13 +10,21 @@ config_setting(
     constraint_values = ["@platforms//os:macos"],
 )
 
-alias(
+gzip_decompress(
     name = "librusty_v8_archive",
-    actual = select({
+    src = select({
         ":macos": "@@_main~third_party~librusty_v8_release_x86_64-apple-darwin//file",
         "//conditions:default": "@@_main~third_party~librusty_v8_release_x86_64-unknown-linux-gnu//file",
     }),
 )
+
+# alias(
+#     name = "librusty_v8_archive",
+#     actual = select({
+#         ":macos": "@@_main~third_party~librusty_v8_release_x86_64-apple-darwin//file",
+#         "//conditions:default": "@@_main~third_party~librusty_v8_release_x86_64-unknown-linux-gnu//file",
+#     }),
+# )
 
 cc_import(
     name = "librusty_v8",

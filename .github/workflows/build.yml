@@ -53,4 +53,5 @@ jobs:
           files: coverage/coverage.info
           flags: unittests
           name: codecov-${{ matrix.os }}
+          directory: .bazel/out/_coverage
           fail_ci_if_error: true

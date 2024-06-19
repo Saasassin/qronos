@@ -318,7 +318,7 @@ dependencies = [
  "static_assertions",
  "tokio",
  "url",
- "v8",
+ "v8 0.93.1",
 ]
 
 [[package]]
@@ -953,6 +953,7 @@ dependencies = [
  "deno_ast",
  "deno_core",
  "tokio",
+ "v8 0.94.0",
 ]
 
 [[package]]
@@ -1144,7 +1145,7 @@ dependencies = [
  "serde",
  "smallvec",
  "thiserror",
- "v8",
+ "v8 0.93.1",
 ]
 
 [[package]]
@@ -1861,6 +1862,21 @@ name = "v8"
 version = "0.93.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "82943fec029559cb43f9d7fc36e2bb85121534702d6f893554e737d1b147d140"
+dependencies = [
+ "bitflags",
+ "fslock",
+ "gzip-header",
+ "home",
+ "miniz_oxide",
+ "once_cell",
+ "which",
+]
+
+[[package]]
+name = "v8"
+version = "0.94.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2295b751f333d95987dded7893a150a557a2df3877f311373400d3a8c580aec"
 dependencies = [
  "bitflags",
  "fslock",

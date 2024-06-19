@@ -4,5 +4,6 @@
   },
   "rust-analyzer.diagnostics.disabled": [
     "E0308"
-  ]
+  ],
+  "rust-analyzer.check.overrideCommand": ["./scripts/check.sh"],
 }

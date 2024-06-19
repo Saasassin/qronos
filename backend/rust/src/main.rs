@@ -10,7 +10,6 @@ use std::path::Path;
 use std::rc::Rc;
 
 use anyhow::anyhow;
-use anyhow::Context;
 use anyhow::Error;
 use deno_ast::MediaType;
 use deno_ast::ParseParams;
@@ -19,6 +18,7 @@ use deno_ast::SourceTextInfo;
 use deno_core::error::AnyError;
 use deno_core::resolve_path;
 use deno_core::url::Url;
+use deno_core::v8;
 use deno_core::JsRuntime;
 use deno_core::ModuleLoadResponse;
 use deno_core::ModuleLoader;
@@ -56,10 +56,10 @@ impl ModuleLoader for TypescriptModuleLoader {
         referrer: &str,
         _kind: ResolutionKind,
     ) -> Result<ModuleSpecifier, Error> {
-        if specifier.starts_with("ext://") {
+        if specifier.starts_with("internal:") {
             Ok(ModuleSpecifier::parse(specifier)?)
         } else {
-            Ok(resolve_path(specifier, Path::new(referrer))?)
+        Ok(resolve_path(specifier, Path::new(referrer))?)
         }
         // Ok(resolve_path(specifier, Path::new(referrer))
         //     .context("Failed to resolve specifier")?
@@ -134,12 +134,17 @@ async fn main() -> Result<(), Error> {
     });
 
     let module_code = r#"
-export function hello(name) {
-    return `Hello, ${name}!`;
+export async function hello(name) {
+    return fetch("https://example.com")
+        .then(response => response.text())
+        .then(text => `Hello, ${name}! ${text}`);
+    // return new Promise((resolve, reject) => {
+    //     resolve(`Hello, ${name}!`);
+    // });
 }
 "#;
 
-    let module_specifier = Url::parse("ext://module").unwrap();
+    let module_specifier = Url::parse("internal:root").unwrap();
     code_map
         .borrow_mut()
         .insert(module_specifier.clone(), module_code.to_string());
@@ -147,16 +152,43 @@ export function hello(name) {
     let mod_id = js_runtime.load_main_es_module(&module_specifier).await?;
 
     js_runtime.mod_evaluate(mod_id).await?;
-    let result = js_runtime.execute_script(
-        "ext://main",
-        r#"
-        (async () => {
-            const { hello } = await import("ext://module");
-            console.log(hello("World"));
-        })();
-        "#,
-    )?;
+    // let result = js_runtime.execute_script(
+    //     "ext://main",
+    //     r#"
+    //     (async () => {
+    //         const { hello } = await import("ext://module");
+    //         console.log(hello("World"));
+    //     })();
+    //     "#,
+    // )?;
 
-    js_runtime.run_event_loop(Default::default()).await?;
+    let module_namespace = js_runtime.get_module_namespace(mod_id).unwrap();
+    let scope = &mut js_runtime.handle_scope();
+    let module_namespace = module_namespace.open(scope);
+
+    // Retrieve the 'hello' function
+    let key = v8::String::new(scope, "hello").unwrap();
+    let hello_function = module_namespace.get(scope, key.into()).unwrap();
+    let hello_fn = v8::Local::<v8::Function>::try_from(hello_function).unwrap();
+
+    // Prepare the arguments for the 'hello' function
+    let name = v8::String::new(scope, "World").unwrap();
+    let args = [name.into()];
+
+    let result = hello_fn.call(scope, hello_function, &args).unwrap();
+
+    if result.is_promise() {
+        let promise = v8::Local::<v8::Promise>::try_from(result).unwrap();
+        let promise_result = promise
+            .result(scope)
+            .to_string(scope)
+            .map(|s| s.to_rust_string_lossy(scope))
+            .unwrap_or_default();
+        println!("Result from hello function promise: {}", promise_result);
+    } else {
+        let result_str = result.to_string(scope).unwrap().to_rust_string_lossy(scope);
+        println!("Result from hello function: {}", result_str);
+    }
+
     Ok(())
 }

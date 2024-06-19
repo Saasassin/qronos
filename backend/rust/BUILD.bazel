@@ -5,5 +5,15 @@ package(default_visibility = ["//visibility:public"])
 rust_binary(
     name = "qronos_runtime",
     srcs = ["src/main.rs"],
-    deps = ["@crates//:deno_core"],
+    deps = [
+        "@crates//:deno_core",
+        "@crates//:deno_ast",
+        "@crates//:tokio",
+        "@crates//:anyhow",
+    ],
+)
+
+alias(
+    name = "rust",
+    actual = ":qronos_runtime",
 )

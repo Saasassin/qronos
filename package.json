@@ -1,7 +1,5 @@
 {
-  "name": "qronos",
-  "version": "1.0.0",
-  "description": "",
+  "private": true,
   "scripts": {},
   "keywords": [],
   "pnpm": {

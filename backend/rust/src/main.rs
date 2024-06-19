@@ -6,10 +6,10 @@
 
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::path::Path;
 use std::rc::Rc;
 
 use anyhow::anyhow;
-use anyhow::bail;
 use anyhow::Context;
 use anyhow::Error;
 use deno_ast::MediaType;
@@ -17,8 +17,8 @@ use deno_ast::ParseParams;
 use deno_ast::SourceMapOption;
 use deno_ast::SourceTextInfo;
 use deno_core::error::AnyError;
-use deno_core::resolve_import;
 use deno_core::resolve_path;
+use deno_core::url::Url;
 use deno_core::JsRuntime;
 use deno_core::ModuleLoadResponse;
 use deno_core::ModuleLoader;
@@ -46,6 +46,7 @@ impl SourceMapGetter for SourceMapStore {
 
 struct TypescriptModuleLoader {
     source_maps: SourceMapStore,
+    code_map: Rc<RefCell<HashMap<ModuleSpecifier, String>>>,
 }
 
 impl ModuleLoader for TypescriptModuleLoader {
@@ -55,7 +56,16 @@ impl ModuleLoader for TypescriptModuleLoader {
         referrer: &str,
         _kind: ResolutionKind,
     ) -> Result<ModuleSpecifier, Error> {
-        Ok(resolve_import(specifier, referrer)?)
+        if specifier.starts_with("ext://") {
+            Ok(ModuleSpecifier::parse(specifier)?)
+        } else {
+            Ok(resolve_path(specifier, Path::new(referrer))?)
+        }
+        // Ok(resolve_path(specifier, Path::new(referrer))
+        //     .context("Failed to resolve specifier")?
+        //     .to_string()
+        //     .parse()
+        //     .context("Failed to parse specifier")?)
     }
 
     fn load(
@@ -66,101 +76,87 @@ impl ModuleLoader for TypescriptModuleLoader {
         _requested_module_type: RequestedModuleType,
     ) -> ModuleLoadResponse {
         let source_maps = self.source_maps.clone();
+        let code_map = self.code_map.clone();
         fn load(
             source_maps: SourceMapStore,
+            code_map: Rc<RefCell<HashMap<ModuleSpecifier, String>>>,
             module_specifier: &ModuleSpecifier,
         ) -> Result<ModuleSource, AnyError> {
-            let path = module_specifier
-                .to_file_path()
-                .map_err(|_| anyhow!("Only file:// URLs are supported."))?;
+            let media_type = MediaType::TypeScript; // Assume TypeScript for simplicity
+            let code = code_map
+                .borrow()
+                .get(module_specifier)
+                .cloned()
+                .ok_or_else(|| anyhow!("Code not found for specifier"))?;
 
-            let media_type = MediaType::from_path(&path);
-            let (module_type, should_transpile) = match MediaType::from_path(&path) {
-                MediaType::JavaScript | MediaType::Mjs | MediaType::Cjs => {
-                    (ModuleType::JavaScript, false)
-                }
-                MediaType::Jsx => (ModuleType::JavaScript, true),
-                MediaType::TypeScript
-                | MediaType::Mts
-                | MediaType::Cts
-                | MediaType::Dts
-                | MediaType::Dmts
-                | MediaType::Dcts
-                | MediaType::Tsx => (ModuleType::JavaScript, true),
-                MediaType::Json => (ModuleType::Json, false),
-                _ => bail!("Unknown extension {:?}", path.extension()),
-            };
-
-            let code = std::fs::read_to_string(&path)?;
-            let code = if should_transpile {
-                let parsed = deno_ast::parse_module(ParseParams {
-                    specifier: module_specifier.clone(),
-                    text_info: SourceTextInfo::from_string(code),
-                    media_type,
-                    capture_tokens: false,
-                    scope_analysis: false,
-                    maybe_syntax: None,
-                })?;
-                let res = parsed.transpile(&deno_ast::EmitOptions {
-                    source_map: SourceMapOption::Separate,
-                    inline_sources: true,
-                    ..Default::default()
-                })?;
-                let source_map = res.source_map.unwrap();
-                source_maps
-                    .0
-                    .borrow_mut()
-                    .insert(module_specifier.to_string(), source_map.into_bytes());
-                res.text
-            } else {
-                code
-            };
+            let parsed = deno_ast::parse_module(ParseParams {
+                specifier: module_specifier.clone(),
+                text_info: SourceTextInfo::from_string(code),
+                media_type,
+                capture_tokens: false,
+                scope_analysis: false,
+                maybe_syntax: None,
+            })?;
+            let res = parsed.transpile(&deno_ast::EmitOptions {
+                source_map: SourceMapOption::Separate,
+                inline_sources: true,
+                ..Default::default()
+            })?;
+            let source_map = res.source_map.unwrap();
+            source_maps
+                .0
+                .borrow_mut()
+                .insert(module_specifier.to_string(), source_map.into_bytes());
             Ok(ModuleSource::new(
-                module_type,
-                ModuleSourceCode::String(code.into()),
+                ModuleType::JavaScript,
+                ModuleSourceCode::String(res.text.into()),
                 module_specifier,
                 None,
             ))
         }
 
-        ModuleLoadResponse::Sync(load(source_maps, module_specifier))
+        ModuleLoadResponse::Sync(load(source_maps, code_map, module_specifier))
     }
 }
 
-fn main() -> Result<(), Error> {
-    let args: Vec<String> = std::env::args().collect();
-    if args.len() < 2 {
-        println!("Usage: target/examples/debug/ts_module_loader <path_to_module>");
-        std::process::exit(1);
-    }
-    let main_url = &args[1];
-    println!("Run {main_url}");
-
+#[tokio::main]
+async fn main() -> Result<(), Error> {
     let source_map_store = SourceMapStore(Rc::new(RefCell::new(HashMap::new())));
+    let code_map = Rc::new(RefCell::new(HashMap::new()));
 
     let mut js_runtime = JsRuntime::new(RuntimeOptions {
         module_loader: Some(Rc::new(TypescriptModuleLoader {
             source_maps: source_map_store.clone(),
+            code_map: code_map.clone(),
         })),
         source_map_getter: Some(Rc::new(source_map_store)),
         ..Default::default()
     });
 
-    let main_module = resolve_path(
-        main_url,
-        &std::env::current_dir().context("Unable to get CWD")?,
+    let module_code = r#"
+export function hello(name) {
+    return `Hello, ${name}!`;
+}
+"#;
+
+    let module_specifier = Url::parse("ext://module").unwrap();
+    code_map
+        .borrow_mut()
+        .insert(module_specifier.clone(), module_code.to_string());
+
+    let mod_id = js_runtime.load_main_es_module(&module_specifier).await?;
+
+    js_runtime.mod_evaluate(mod_id).await?;
+    let result = js_runtime.execute_script(
+        "ext://main",
+        r#"
+        (async () => {
+            const { hello } = await import("ext://module");
+            console.log(hello("World"));
+        })();
+        "#,
     )?;
 
-    let future = async move {
-        let mod_id = js_runtime.load_main_es_module(&main_module).await?;
-        let result = js_runtime.mod_evaluate(mod_id);
-        js_runtime.run_event_loop(Default::default()).await?;
-        result.await
-    };
-
-    tokio::runtime::Builder::new_current_thread()
-        .enable_all()
-        .build()
-        .unwrap()
-        .block_on(future)
+    js_runtime.run_event_loop(Default::default()).await?;
+    Ok(())
 }

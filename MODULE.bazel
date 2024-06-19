@@ -215,7 +215,8 @@ pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
     hub_name = "pip",
     python_version = "3.12",
-    requirements_lock = "//backend/python:requirements.txt",
+    requirements_darwin = "//backend/python:requirements_darwin.txt",
+    requirements_linux = "//backend/python:requirements_linux.txt",
 )
 
 use_repo(pip, "pip")

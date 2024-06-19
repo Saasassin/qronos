@@ -13,7 +13,8 @@ compile_pip_requirements(
     name = "requirements",
     extra_args = ["--allow-unsafe"],
     requirements_in = "requirements.in",
-    requirements_txt = "requirements.txt",
+    requirements_darwin = "requirements_darwin.txt",
+    requirements_linux = "requirements_linux.txt",
 )
 
 py_setup_gazelle(

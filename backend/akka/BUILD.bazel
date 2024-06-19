@@ -80,6 +80,7 @@ oci_tarball(
     name = "main_oci_tarball",
     image = ":main_oci",
     repo_tags = ["qronos_backend:latest"],
+    tags = ["manual"],
 )
 
 alias(

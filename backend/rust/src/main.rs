@@ -59,7 +59,7 @@ impl ModuleLoader for TypescriptModuleLoader {
         if specifier.starts_with("internal:") {
             Ok(ModuleSpecifier::parse(specifier)?)
         } else {
-        Ok(resolve_path(specifier, Path::new(referrer))?)
+            Ok(resolve_path(specifier, Path::new(referrer))?)
         }
         // Ok(resolve_path(specifier, Path::new(referrer))
         //     .context("Failed to resolve specifier")?

@@ -44,14 +44,5 @@ jobs:
       - name: Build all targets
         run: bazel build //...
 
-      - name: Tests W/ coverage
-        run: bazel coverage --combined_report=lcov //...
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
-        with:
-          files: coverage/coverage.info
-          flags: unittests
-          name: codecov-${{ matrix.os }}
-          directory: .bazel/out/_coverage
-          fail_ci_if_error: true
+      - name: Run all tests
+        run: bazel test //...

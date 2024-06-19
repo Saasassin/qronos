@@ -1,3 +1,10 @@
+"""Bazel build for Qronos."""
+
+module(
+    name = "qronos",
+    repo_name = "qronos",
+)
+
 bazel_dep(name = "bazel_skylib", version = "1.6.1")
 bazel_dep(name = "rules_java", version = "7.6.1")
 bazel_dep(name = "rules_jvm_external", version = "6.1")
@@ -13,11 +20,19 @@ bazel_dep(name = "aspect_rules_py", version = "0.7.3")
 bazel_dep(name = "rules_python", dev_dependency = True, version = "0.33.1")
 bazel_dep(name = "rules_python_gazelle_plugin", version = "0.33.1")
 bazel_dep(name = "gazelle", version = "0.37.0", repo_name = "bazel_gazelle")
+bazel_dep(name = "rules_rust", version = "0.46.0")
 
 # Internal Extension Section
 
 constants = use_extension("//bazel:extensions.bzl", "constants")
 use_repo(constants, "constants")
+
+third_party = use_extension("//third_party:extensions.bzl", "third_party")
+use_repo(
+    third_party,
+    "librusty_v8_release_x86_64-unknown-linux-gnu",
+    "librusty_v8_release_x86_64-apple-darwin",
+)
 
 # C/C++ Section
 
@@ -202,3 +217,27 @@ pip.parse(
 )
 
 use_repo(pip, "pip")
+
+# Rust section
+
+crate = use_extension(
+    "@rules_rust//crate_universe:extension.bzl",
+    "crate",
+)
+
+crate.from_cargo(
+    name = "crates",
+    cargo_lockfile = "//backend/rust:Cargo.lock",
+    manifests = ["//backend/rust:Cargo.toml"],
+)
+
+use_repo(crate, "crates")
+
+crate.annotation(
+    additive_build_file = "//third_party:BUILD.v8.bazel",
+    crate = "v8",
+    gen_build_script = "off",
+    repositories = ["crates"],
+    deps = [":librusty_v8"],
+    version = "*",
+)

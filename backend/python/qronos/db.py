@@ -8,8 +8,8 @@ class RunHistory(SQLModel, table=True):
     id: UUID = Field(default=None, primary_key=True)
     stdout: str = Field(default=None, nullable=True)
     stderr: str = Field(default=None, nullable=True)
-    updated_at: datetime = Field(default=datetime.now(tz=timezone.utc))
-    created_at: datetime = Field(default=datetime.now(tz=timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
 
 _opts = {}
 if SETTINGS.env == Env.dev:

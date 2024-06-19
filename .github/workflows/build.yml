@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      
+
       - name: Install ncurses
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: sudo apt-get install -y libncurses5-dev libncursesw5-dev
@@ -27,11 +27,12 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ~/.cache/bazel
-            /tmp/bazel_output
-          key: ${{ runner.os }}-bazel-${{ hashFiles('**/WORKSPACE', '**/BUILD.bazel', '**/BUILD') }}
+            ./.bazel-cache/
+          key: ${{ matrix.os }}-bazel-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}-
           restore-keys: |
-            ${{ runner.os }}-bazel-
+            ${{ matrix.os }}-bazel-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}-
+            ${{ matrix.os }}-bazel-refs/head/main-
+            ${{ matrix.os }}-bazel-
 
       - name: Build all targets
         run: bazel build //...

@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Bazel cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/bazel
+            /tmp/bazel_output
+          key: ${{ runner.os }}-bazel-${{ hashFiles('**/WORKSPACE', '**/BUILD.bazel', '**/BUILD') }}
+          restore-keys: |
+            ${{ runner.os }}-bazel-
+
+      - name: Build all targets
+        run: bazel build //...

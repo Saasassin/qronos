@@ -6,15 +6,32 @@
 
 load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
 load("@pip//:requirements.bzl", "all_whl_requirements")
+load("@rules_multirun//:defs.bzl", "multirun")
 load("@rules_python//python/pip_install:requirements.bzl", "compile_pip_requirements")
+load("@rules_uv//uv:pip.bzl", "pip_compile")
 load("//bazel:python.bzl", "py_setup_gazelle")
 
-compile_pip_requirements(
-    name = "requirements",
-    extra_args = ["--allow-unsafe"],
+pip_compile(
+    name = "generate_requirements_linux_txt",
+    python_platform = "x86_64-unknown-linux-gnu",
     requirements_in = "requirements.in",
-    requirements_darwin = "requirements_darwin.txt",
-    requirements_linux = "requirements_linux.txt",
+    requirements_txt = "requirements_linux.txt",
+)
+
+pip_compile(
+    name = "generate_requirements_darwin_txt",
+    python_platform = "aarch64-apple-darwin",
+    requirements_in = "requirements.in",
+    requirements_txt = "requirements_darwin.txt",
+)
+
+multirun(
+    name = "generate_requirements_lock",
+    commands = [
+        ":generate_requirements_linux_txt",
+        ":generate_requirements_darwin_txt",
+    ],
+    jobs = 1,
 )
 
 py_setup_gazelle(

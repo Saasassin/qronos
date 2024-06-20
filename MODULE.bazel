@@ -22,6 +22,8 @@ bazel_dep(name = "rules_python_gazelle_plugin", version = "0.33.1")
 bazel_dep(name = "gazelle", version = "0.37.0", repo_name = "bazel_gazelle")
 bazel_dep(name = "rules_rust", version = "0.46.0")
 bazel_dep(name = "rules_gzip", version = "1.0.0-beta.1")
+bazel_dep(name = "rules_uv", version = "0.14.0")
+bazel_dep(name = "rules_multirun", version = "0.9.0")
 
 # Internal Extension Section
 

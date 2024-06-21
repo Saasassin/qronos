@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const SideNav = () => {
   return (
     <aside
@@ -8,8 +10,8 @@ const SideNav = () => {
       <div className="overflow-y-auto py-5 px-3 h-full bg-white dark:bg-gray-800">
         <ul className="space-y-2">
           <li>
-            <a
-              href="#"
+            <Link
+              href="/"
               className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
             >
               <svg
@@ -23,12 +25,12 @@ const SideNav = () => {
                 <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
               </svg>
               <span className="ml-3">Overview</span>
-            </a>
+            </Link>
           </li>
           <li>
-            <a
-              href="#"
-              className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
+            <Link
+              to="/create_script"
+              className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
             >
               <svg
                 className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -51,7 +53,7 @@ const SideNav = () => {
               <span className="flex-1 ml-3 text-left whitespace-nowrap">
                 Create
               </span>
-            </a>
+            </Link>
           </li>
 
           <li>

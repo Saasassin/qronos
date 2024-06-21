@@ -57,8 +57,8 @@ const SideNav = () => {
           </li>
 
           <li>
-            <a
-              href="#"
+            <Link
+              to="/browse_scripts"
               className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
             >
               <svg
@@ -81,12 +81,12 @@ const SideNav = () => {
               <span className="flex-1 ml-3 text-left whitespace-nowrap">
                 Browse
               </span>
-            </a>
+            </Link>
           </li>
 
           <li>
-            <a
-              href="#"
+            <Link
+              to="/view_history"
               className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
             >
               <svg
@@ -109,7 +109,7 @@ const SideNav = () => {
               <span className="flex-1 ml-3 text-left whitespace-nowrap">
                 Run History
               </span>
-            </a>
+            </Link>
           </li>
         </ul>
         <ul className="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">

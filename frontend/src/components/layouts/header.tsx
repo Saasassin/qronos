@@ -1,3 +1,5 @@
+import { DarkThemeToggle } from "flowbite-react";
+
 const Header = () => {
   return (
     <header>
@@ -558,6 +560,8 @@ const Header = () => {
                 </a>
               </div>
             </div>
+            <DarkThemeToggle />
+
             <button
               type="button"
               className="flex mx-3 text-sm bg-gray-800 rounded-full md:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"

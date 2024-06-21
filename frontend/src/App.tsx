@@ -6,16 +6,14 @@ import Home from "./components/pages/home";
 
 const App = () => {
   return (
-    <>
-      <Flowbite>
-        <Header />
-        <SideNav />
-        <main>
-          <Home />
-        </main>
-        <Footer />
-      </Flowbite>
-    </>
+    <Flowbite>
+      <Header />
+      <SideNav />
+      <main>
+        <Home />
+      </main>
+      <Footer />
+    </Flowbite>
   );
 };
 

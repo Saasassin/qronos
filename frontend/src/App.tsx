@@ -10,7 +10,7 @@ const App = () => {
       <Flowbite>
         <Header />
         <SideNav />
-        <main className="p-4 md:ml-64 h-auto pt-20" id="root">
+        <main>
           <Home />
         </main>
         <Footer />

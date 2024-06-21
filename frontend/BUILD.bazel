@@ -10,7 +10,10 @@ vite.vite(
         "*.js",
         "*.json",
         "*.html",
-    ]) + [":node_modules"],
+    ]) + [
+        ":node_modules",
+        "//:node_modules",
+    ],
     args = [
         "build",
         "--mode",

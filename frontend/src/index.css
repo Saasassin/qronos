@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 :root {
-  @apply bg-gray-900 dark:text-slate-400 antialiased;
 }
 
 body {
+  @apply bg-gray-900 dark:text-slate-400 antialiased;
 }
 
 relative {

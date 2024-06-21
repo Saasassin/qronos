@@ -13,15 +13,15 @@ const App = () => {
         <Header />
         <SideNav />
         <main>
-          <Home />
+          <Routes>
+            <Route index element={<Home />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/create_script" element={<CreateScript />} />
+            {/* <Route path="*" element={<NoMatch />} /> */}
+          </Routes>
+          <Footer />
         </main>
-        <Footer />
       </Flowbite>
-      <Routes>
-        <Route path="/" index element={<Home />} />
-        <Route path="create_script" element={<CreateScript />} />
-        {/* <Route path="*" element={<NoMatch />} /> */}
-      </Routes>
     </>
   );
 };

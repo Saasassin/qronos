@@ -7,7 +7,6 @@
 load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
 load("@pip//:requirements.bzl", "all_whl_requirements")
 load("@rules_multirun//:defs.bzl", "multirun")
-load("@rules_python//python/pip_install:requirements.bzl", "compile_pip_requirements")
 load("@rules_uv//uv:pip.bzl", "pip_compile")
 load("//bazel:python.bzl", "py_setup_gazelle")
 

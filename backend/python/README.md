@@ -24,9 +24,11 @@ This will generate `.main.venv` in the root of the python directory with the ful
 
 ### MacOS & VSCode Users
 
-_Do not_ use Finder to specify the interpreter path. If you look carefully there is a blank for pasting the relative path to the generated `.main.venv` directory. (Or if you are using our checked in `settings.json`, just select the default interpreter).
+_Do not_ use Finder to specify the interpreter path. If you look carefully there is a blank above "Find" for pasting the relative path to the generated `.main.venv` directory.
 
 ![image](../../docs/python_select_interpreter.png)
+
+Or if you are using our checked in `settings.json`, just select the default interpreter.
 
 ### Live Reload
 

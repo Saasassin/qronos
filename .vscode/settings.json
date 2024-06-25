@@ -5,5 +5,8 @@
   "rust-analyzer.diagnostics.disabled": [
     "E0308"
   ],
-  "rust-analyzer.check.overrideCommand": ["./scripts/check.sh"],
+  "rust-analyzer.check.overrideCommand": [
+    "./scripts/check.sh"
+  ],
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/python/.main.venv/bin/python",
 }

@@ -8,7 +8,7 @@ To run the API Server, run:
 bazel run //backend/python:main
 ```
 
-This will start the server on [http://localhost:8080](http://localhost:8080).
+This will start the server on [http://localhost:8080](http://localhost:8080). A SQLite database will automatically be created in `backend/python` called `database.db`.
 
 For the swagger docs, visit [http://localhost:8080/docs](http://localhost:8080/docs).
 

@@ -53,7 +53,7 @@ py_binary(
 
 py_library(
     name = "python",
-    srcs = ["main.py"],
+    srcs = glob(["*.py"]),
     visibility = ["//backend/python:__subpackages__"],
     deps = [
         "//backend/python/qronos",

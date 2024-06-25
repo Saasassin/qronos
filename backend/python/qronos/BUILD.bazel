@@ -2,11 +2,9 @@ load("@aspect_rules_py//py:defs.bzl", "py_library")
 
 py_library(
     name = "qronos",
-    srcs = [
-        "__init__.py",
-        "db.py",
-        "settings.py",
-    ],
+    srcs = glob([
+        "**/*.py"
+    ]),
     imports = [".."],
     visibility = ["//backend/python:__subpackages__"],
     deps = [

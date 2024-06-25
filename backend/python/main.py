@@ -9,8 +9,8 @@ app = FastAPI()
 
 @app.get("/")
 async def read_root():
-    return {"Hello": "World"}
-
+    return {"Yo!": "Mama!"}
+ 
 class RunRequest(BaseModel):
     cpu_limit: float
     memory_limit: str

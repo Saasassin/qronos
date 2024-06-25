@@ -1,5 +1,17 @@
 # Python Backend
 
+This directory contains the REST API for the Qronos service. It is built using FastAPI.
+
+To run the API Server, run:
+
+```bash
+bazel run //backend/python:main
+```
+
+This will start the server on [http://localhost:8080](http://localhost:8080).
+
+For the swagger docs, visit [http://localhost:8080/docs](http://localhost:8080/docs).
+
 ## Local Dev
 
 To setup local development environment, run:
@@ -9,6 +21,14 @@ bazel run //backend/python:main.venv
 ```
 
 This will generate `.main.venv` in the root of the python directory with the full bazel provided python toolchain and dependencies.
+
+### Live Reload
+
+If you are developing and want live reload, install `ibazel` and run the following command:
+
+```bash
+ibazel run //backend/python:main
+```
 
 ## Adding deps
 

@@ -29,10 +29,10 @@ There's a list of handy extensions in the [frontend README](frontend/README.md).
 bazel build //...
 ```
 
-## Run Backend
+## Run API
 
 ```bash
-bazel run //backend/akka
+bazel run //backend/python:main
 ```
 
 ## Adding JVM dependencies

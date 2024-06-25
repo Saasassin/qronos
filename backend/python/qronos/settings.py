@@ -1,3 +1,4 @@
+import logging
 import os
 
 from enum import Enum
@@ -17,4 +18,11 @@ class Settings(BaseSettings):
 if os.getenv("ENV") == "prod":
     SETTINGS = Settings(_env_file=".env.prod", env=Env.prod)
 else:
-    SETTINGS = Settings(_env_file="backend/python/.env", env=Env.dev)
+    env_path = "backend/python/.env"
+    try:
+        os.chdir(os.environ["BUILD_WORKSPACE_DIRECTORY"] + "/backend/python")
+        env_path = ".env"
+    except Exception as e:
+        logging.warning("Could not change directory to backend/python", exc_info=e)
+        logging.warning(f"fallback to default path: {env_path}")
+    SETTINGS = Settings(_env_file=env_path, env=Env.dev)

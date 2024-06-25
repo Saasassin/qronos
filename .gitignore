@@ -16,3 +16,5 @@ dist/
 
 target/
 rust-project.json
+
+database.db

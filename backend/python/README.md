@@ -43,7 +43,7 @@ ibazel run //backend/python:main
 To add dependencies, add them to the `requirements.in` file and run:
 
 ```bash
-bazel run //backend/python:requirements.update
+bazel run //backend/python:generate_requirements_lock
 ```
 
 Which will generate a new `requirements.txt` lock file.

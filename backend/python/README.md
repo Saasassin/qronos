@@ -22,6 +22,12 @@ bazel run //backend/python:main.venv
 
 This will generate `.main.venv` in the root of the python directory with the full bazel provided python toolchain and dependencies.
 
+### MacOS & VSCode Users
+
+_Do not_ use Finder to specify the interpreter path. If you look carefully there is a blank for pasting the relative path to the generated `.main.venv` directory. (Or if you are using our checked in `settings.json`, just select the default interpreter).
+
+![image](../../docs/python_select_interpreter.png)
+
 ### Live Reload
 
 If you are developing and want live reload, install `ibazel` and run the following command:

@@ -40,7 +40,7 @@ async def read_users():
         users = session.exec(select(User)).all()
         return users
     
-@app.get("/users/{user_id}", response_model=UserPublic)
+@app.get("/users/{user_id}", response_model=UserPublic | None)
 async def read_user(user_id: int):
     with Session(get_engine()) as session:
         return session.exec(select(User).where(User.id == user_id)).first()

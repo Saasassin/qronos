@@ -5,9 +5,9 @@ from fastapi import Body, FastAPI
 from qronos.db import create_db_and_tables
 from pydantic import BaseModel
 from sqlalchemy import engine_from_config
-from sqlmodel import Session
+from sqlmodel import Session, select
 
-from backend.python.qronos.db import SystemSetting, User, get_engine
+from backend.python.qronos.db import SystemSetting, User, UserCreate, UserPublic, get_engine
 
 app = FastAPI()
 
@@ -34,25 +34,25 @@ async def run_code(opts: Annotated[RunRequest | None, Body(embed=True)] = None):
 
     return {"stdout": stdout.decode(), "stderr": stderr.decode()}
 
-@app.get("/users")
+@app.get("/users", response_model=list[UserPublic])
 async def read_users():
     with Session(get_engine()) as session:
-        users = session.exec(User).all()
-        return {"users": users}
+        users = session.exec(select(User)).all()
+        return users
     
-@app.get("/users/{user_id}")
+@app.get("/users/{user_id}", response_model=UserPublic)
 async def read_user(user_id: int):
     with Session(get_engine()) as session:
-        user = session.exec(User).get(user_id)
-        return {"user": user}
+        return session.exec(select(User).where(User.id == user_id)).first()
 
-@app.post("/user")
-async def create_user(user: User):
+@app.post("/user", response_model=UserPublic)
+async def create_user(user_create: UserCreate):
     with Session(get_engine()) as session:
+        user = User.model_validate(user_create)
         session.add(user)
         session.commit()
         session.refresh(user)
-        return {"user": user}
+        return user
 
 @app.get("/settings")
 async def read_settings():

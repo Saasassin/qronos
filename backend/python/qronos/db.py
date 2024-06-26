@@ -57,14 +57,24 @@ class RunHistory(SQLModel, table=True, extend_existing=True):
     finished_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc), nullable=True)
     total_run_time_in_seconds: float = Field(default=None, nullable=True)
 
-class User(SQLModel, table=True):
+class UserBase(SQLModel):
+    email: str = Field(sa_column=Column("email", String, unique=True, nullable=False))
+    password: str = Field(nullable=False)
+
+class User(UserBase, table=True):
     __table_args__ = {'extend_existing': True}
     __tablename__ = "user"
     id: Optional[int] = Field(default=None, primary_key=True)
-    email: str = Field(sa_column=Column("email", String, unique=True, nullable=False))
-    password: str = Field(nullable=False)
     updated_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
     created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
+
+class UserCreate(UserBase):
+    pass
+
+class UserPublic(UserBase):
+    id: Optional[int]
+    updated_at: datetime
+    created_at: datetime
 
 class SystemSetting(SQLModel, table=True):
     __tablename__ = "systemsetting"

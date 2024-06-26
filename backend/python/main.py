@@ -4,6 +4,10 @@ from typing import Annotated
 from fastapi import Body, FastAPI
 from qronos.db import create_db_and_tables
 from pydantic import BaseModel
+from sqlalchemy import engine_from_config
+from sqlmodel import Session
+
+from backend.python.qronos.db import SystemSetting, User, get_engine
 
 app = FastAPI()
 
@@ -29,6 +33,42 @@ async def run_code(opts: Annotated[RunRequest | None, Body(embed=True)] = None):
         stdout, stderr = await process.communicate()
 
     return {"stdout": stdout.decode(), "stderr": stderr.decode()}
+
+@app.get("/users")
+async def read_users():
+    with Session(get_engine()) as session:
+        users = session.exec(User).all()
+        return {"users": users}
+    
+@app.get("/users/{user_id}")
+async def read_user(user_id: int):
+    with Session(get_engine()) as session:
+        user = session.exec(User).get(user_id)
+        return {"user": user}
+
+@app.post("/user")
+async def create_user(user: User):
+    with Session(get_engine()) as session:
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+        return {"user": user}
+
+@app.get("/settings")
+async def read_settings():
+    with Session(get_engine()) as session:
+        settings = session.exec(SystemSetting).first()
+        if settings:
+            return {"settings": settings.value}
+
+@app.put("/settings")
+async def update_settings(settings: SystemSetting):
+    with Session(get_engine()) as session:
+        session.add(settings)
+        session.commit()
+        session.refresh(settings)
+        return {"settings": settings.value}
+
 
 if __name__ == "__main__":
     create_db_and_tables()

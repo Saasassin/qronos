@@ -1,6 +1,11 @@
-# Python Backend
+# Qronos REST API
 
-This directory contains the REST API for the Qronos service. It is built using FastAPI.
+This directory contains the REST API for the Qronos service. It is built using FastAPI and SQLAlchemy running on SQLLite.
+
+The REST API is responsible for managing the state of the Qronos service, including:
+
+- the creation, execution, monitoring, and response of jobs to the UI
+- powering the UI with data from the database (e.g. job history, job status, user management, etc.)
 
 To run the API Server, run:
 

@@ -11,7 +11,8 @@ from sqlmodel import SQLModel, Field, JSON, Enum, Column
 class ScriptType(str, enum.Enum):
     '''
     Enum for script type.
-    We assume RUNNABLE scripts can be schduled. API scripts are not.
+    API: An on-demand script deployed as an API. CANNOT be scheduled.
+    RUNNABLE: A script that can be scheduled or run on-demand.
     '''
     API = "API"
     RUNNABLE = "RUNNABLE"

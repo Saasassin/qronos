@@ -1,48 +1,75 @@
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
+
+# Seemingly a side effect of rules_foreign_cc bzlmod integration being broken?
 
 http_archive(
-    name = "io_bazel_rules_scala",
-    sha256 = "3b00fa0b243b04565abb17d3839a5f4fa6cc2cac571f6db9f83c1982ba1e19e5",
-    strip_prefix = "rules_scala-6.5.0",
-    url = "https://github.com/bazelbuild/rules_scala/releases/download/v6.5.0/rules_scala-v6.5.0.tar.gz",
+    name = "toolchains_llvm",
+    canonical_id = "1.0.0",
+    sha256 = "e91c4361f99011a54814e1afbe5c436e0d329871146a3cd58c23a2b4afb50737",
+    strip_prefix = "toolchains_llvm-1.0.0",
+    url = "https://github.com/bazel-contrib/toolchains_llvm/releases/download/1.0.0/toolchains_llvm-1.0.0.tar.gz",
 )
 
-load("@constants//:vars.bzl", "SCALA_FULL_VERSION")
-load("@io_bazel_rules_scala//:scala_config.bzl", "scala_config")
+load("@toolchains_llvm//toolchain:deps.bzl", "bazel_toolchain_dependencies")
 
-scala_config(
-    # Not entirely sure what the cost of this option is and why it's not enabled by default
-    # but it seems to allow for very dead dependency tracking.
-    enable_compiler_dependency_tracking = True,
-    scala_version = SCALA_FULL_VERSION,
+bazel_toolchain_dependencies()
+
+load("@toolchains_llvm//toolchain:rules.bzl", "llvm_toolchain")
+
+llvm_toolchain(
+    name = "llvm_toolchain",
+    llvm_versions = {
+        "darwin-aarch64": "16.0.0",
+        "linux-x86_64": "16.0.0",
+    },
+    # stdlib = {
+    #     "darwin-aarch64": "none",
+    # },
 )
 
-load("@io_bazel_rules_scala//scala:scala.bzl", "rules_scala_setup", "rules_scala_toolchain_deps_repositories")
+load("@llvm_toolchain//:toolchains.bzl", "llvm_register_toolchains")
 
-# loads other rules Rules Scala depends on
-rules_scala_setup()
+llvm_register_toolchains()
 
-# Loads Maven deps like Scala compiler and standard libs. On production projects you should consider
-# defining a custom deps toolchains to use your project libs instead
-rules_scala_toolchain_deps_repositories(fetch_sources = True)
+# rules_foreign_cc bzlmod integration seems broken atm so using WORKSPACE for now.
 
-load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
-
-rules_proto_dependencies()
-
-rules_proto_toolchains()
-
-# load("@io_bazel_rules_scala//scala:toolchains.bzl", "scala_register_toolchains")
-
-# scala_register_toolchains()
-
-# optional: setup ScalaTest toolchain and dependencies
-load("@io_bazel_rules_scala//testing:scalatest.bzl", "scalatest_repositories", "scalatest_toolchain")
-
-scalatest_repositories()
-
-scalatest_toolchain()
-
-register_toolchains(
-    "//:semanticdb_toolchain",
+git_repository(
+    name = "rules_foreign_cc",
+    commit = "df265bb33ae3f7c24c099f79b43558ac9f3e20b6",
+    remote = "https://github.com/bazelbuild/rules_foreign_cc.git",
+    repo_mapping = {
+    },
 )
+
+load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
+
+rules_foreign_cc_dependencies()
+
+maybe(
+    http_archive,
+    name = "libffi",
+    build_file = "//third_party:BUILD.libffi.bazel",
+    sha256 = "b0dea9df23c863a7a50e825440f3ebffabd65df1497108e5d437747843895a4e",
+    strip_prefix = "libffi-3.4.6",
+    url = "https://github.com/libffi/libffi/releases/download/v3.4.6/libffi-3.4.6.tar.gz",
+)
+
+http_archive(
+    name = "com_google_protobuf",
+    remote_patch_strip = 1,
+    remote_patches = {
+        "https://raw.githubusercontent.com/bazelbuild/bazel-central-registry/main/modules/protobuf/23.1/patches/0007-bazel-Get-rid-of-exec_tools.-13401.patch": "sha256-Thj5ZYqMpgaUrjZv8XyWqyD+I6XQNcZjo4jI14a7QxE=",
+    },
+    sha256 = "dc167b7d23ec0d6e4a3d4eae1798de6c8d162e69fa136d39753aaeb7a6e1289d",
+    strip_prefix = "protobuf-23.1",
+    urls = [
+        "https://mirror.bazel.build/github.com/protocolbuffers/protobuf/archive/v23.1.tar.gz",
+        "https://github.com/protocolbuffers/protobuf/archive/v23.1.tar.gz",
+    ],
+)
+
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+
+protobuf_deps()

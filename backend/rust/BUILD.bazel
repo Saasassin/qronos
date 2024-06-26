@@ -5,10 +5,12 @@ package(default_visibility = ["//visibility:public"])
 rust_binary(
     name = "qronos_runtime",
     srcs = ["src/main.rs"],
+    compile_data = glob(["src/*.js"]),
     deps = [
         "@crates//:anyhow",
         "@crates//:deno_ast",
         "@crates//:deno_core",
+        "@crates//:deno_runtime",
         "@crates//:tokio",
     ],
 )

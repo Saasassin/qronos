@@ -203,9 +203,3 @@ crate.annotation(
     repositories = ["crates"],
     version = "*",
 )
-
-# crate.spec(package = "prost", version = "0")
-# crate.spec(package = "prost-types", version = "0")
-# crate.spec(package = "protoc-gen-prost", version = "0")
-# crate.spec(package = "protoc-gen-tonic", version = "0")
-# crate.spec(package = "tonic", version = "0")

@@ -20,6 +20,7 @@ configure_make(
         "@platforms//os:macos": {
             "ARFLAGS": "-static -o",
         },
+        "//conditions:default": {},
     }),
     lib_source = ":all_srcs",
 )

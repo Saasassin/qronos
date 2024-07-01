@@ -1,10 +1,7 @@
-import asyncio
 
-from typing import Annotated
-from fastapi import Body, FastAPI
+from fastapi import FastAPI
 from qronos.db import create_db_and_tables
-from pydantic import BaseModel
-from qronos.routers import user, settings, history, runner
+from qronos.routers import user, settings, history, runner, script, default
 from fastapi.openapi.utils import get_openapi
 
 tags_metadata = [    
@@ -13,6 +10,7 @@ tags_metadata = [
     {"name": "Run History Methods"},    
     {"name": "User Methods"},
     {"name": "Settings Methods"},
+    {"name": "Default Methods"}
 ]
 
 def qronos_openapi_schema():
@@ -40,17 +38,15 @@ def qronos_openapi_schema():
    return app.openapi_schema
 
 app = FastAPI(openapi_tags=tags_metadata)
+app.include_router(script.router)
+app.include_router(runner.router)
+app.include_router(history.router)
 app.include_router(user.router)
 app.include_router(settings.router)
-app.include_router(history.router)
-app.include_router(runner.router)
+app.include_router(default.router)
 
 app.openapi = qronos_openapi_schema
 
-@app.get("/")
-async def read_root():
-    return {"Qronos Bot Says": "Welcome to Qronos!"}
- 
 
 if __name__ == "__main__":
     create_db_and_tables()

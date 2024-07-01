@@ -8,4 +8,5 @@ export default defineConfig({
     //    open: "/index.html",
     port: 3000,
   },
+  envPrefix: "QRONOS_",
 });

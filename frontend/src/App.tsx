@@ -34,4 +34,6 @@ const App = () => {
   );
 };
 
+console.log(import.meta.env.QRONOS_API_URL);
+console.log(import.meta.env.VITE_SOME_KEY);
 export default App;

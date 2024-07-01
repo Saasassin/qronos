@@ -8,11 +8,11 @@ from qronos.routers import user, settings, history, runner
 from fastapi.openapi.utils import get_openapi
 
 tags_metadata = [    
-    {"name": "Runner Methods", "description": "Run your code"},
-    {"name": "Script Methods", "description": "Keep doing this"},
-    {"name": "Run History Methods", "description": "KILL 'EM ALL"},    
-    {"name": "User Methods", "description": "One other way around"},
-    {"name": "Settings Methods", "description": "Boring"},
+    {"name": "Runner Methods"},
+    {"name": "Script Methods"},
+    {"name": "Run History Methods"},    
+    {"name": "User Methods"},
+    {"name": "Settings Methods"},
 ]
 
 def qronos_openapi_schema():

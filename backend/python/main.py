@@ -4,71 +4,53 @@ from typing import Annotated
 from fastapi import Body, FastAPI
 from qronos.db import create_db_and_tables
 from pydantic import BaseModel
-from sqlalchemy import engine_from_config
-from sqlmodel import Session, select
+from qronos.routers import user, settings, history, runner
+from fastapi.openapi.utils import get_openapi
 
-from backend.python.qronos.db import SystemSetting, User, UserCreate, UserPublic, get_engine
+tags_metadata = [    
+    {"name": "Runner Methods", "description": "Run your code"},
+    {"name": "Script Methods", "description": "Keep doing this"},
+    {"name": "Run History Methods", "description": "KILL 'EM ALL"},    
+    {"name": "User Methods", "description": "One other way around"},
+    {"name": "Settings Methods", "description": "Boring"},
+]
 
-app = FastAPI()
+def qronos_openapi_schema():
+   openapi_schema = get_openapi(
+       title="The Amazing Programming Language Info API",
+       version="1.0",
+       routes=app.routes,
+   )
+   openapi_schema["info"] = {
+       "title" : "Qronos REST API",
+       "version" : "1.0",
+       "description" : "REST API for the Qronos Script Execution Engine",
+#       "termsOfService": "",
+       "contact": {
+           "name": "Get Help with this API",
+           "url": "https://github.com/Saasassin/qronos",
+           "email": ""
+       },
+       "license": {
+           "name": "AGPL v3",
+           "url": "https://github.com/Saasassin/qronos/blob/master/LICENSE"
+       }
+   }
+   app.openapi_schema = openapi_schema
+   return app.openapi_schema
+
+app = FastAPI(openapi_tags=tags_metadata)
+app.include_router(user.router)
+app.include_router(settings.router)
+app.include_router(history.router)
+app.include_router(runner.router)
+
+app.openapi = qronos_openapi_schema
 
 @app.get("/")
 async def read_root():
-    return {"Yo!": "Mama!"}
+    return {"Qronos Bot Says": "Welcome to Qronos!"}
  
-class RunRequest(BaseModel):
-    cpu_limit: float
-    memory_limit: str
-    image_name: str
-
-@app.post("/run")
-async def run_code(opts: Annotated[RunRequest | None, Body(embed=True)] = None):
-    req = opts or RunRequest(cpu_limit=0.5, memory_limit="512m", image_name="hello-world:latest")
-    process = await asyncio.create_subprocess_exec("docker", "run", "--rm", "--cpus", str(req.cpu_limit),
-                                                   "--memory", req.memory_limit, req.image_name,
-                                                   stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
-    try:
-        stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=10)
-    except asyncio.TimeoutError:
-        process.kill()
-        stdout, stderr = await process.communicate()
-
-    return {"stdout": stdout.decode(), "stderr": stderr.decode()}
-
-@app.get("/users", response_model=list[UserPublic])
-async def read_users():
-    with Session(get_engine()) as session:
-        users = session.exec(select(User)).all()
-        return users
-    
-@app.get("/users/{user_id}", response_model=UserPublic | None)
-async def read_user(user_id: int):
-    with Session(get_engine()) as session:
-        return session.exec(select(User).where(User.id == user_id)).first()
-
-@app.post("/user", response_model=UserPublic)
-async def create_user(user_create: UserCreate):
-    with Session(get_engine()) as session:
-        user = User.model_validate(user_create)
-        session.add(user)
-        session.commit()
-        session.refresh(user)
-        return user
-
-@app.get("/settings")
-async def read_settings():
-    with Session(get_engine()) as session:
-        settings = session.exec(SystemSetting).first()
-        if settings:
-            return {"settings": settings.value}
-
-@app.put("/settings")
-async def update_settings(settings: SystemSetting):
-    with Session(get_engine()) as session:
-        session.add(settings)
-        session.commit()
-        session.refresh(settings)
-        return {"settings": settings.value}
-
 
 if __name__ == "__main__":
     create_db_and_tables()

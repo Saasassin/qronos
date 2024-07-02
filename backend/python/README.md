@@ -17,7 +17,7 @@ This will start the server on [http://localhost:8080](http://localhost:8080). A 
 
 For the swagger docs, visit [http://localhost:8080/docs](http://localhost:8080/docs).
 
-## Local Dev
+# Local Dev
 
 To setup local development environment, run:
 
@@ -27,20 +27,28 @@ bazel run //backend/python:venv
 
 This will generate `.venv` in the root of the python directory with the full bazel provided python toolchain and dependencies.
 
-### MacOS & VSCode Users
+## MacOS & VSCode Users
 
 _Do not_ use Finder to specify the interpreter path. If you look carefully there is a blank above "Find" for pasting the relative path to the generated `.venv` directory.
 
 ![image](../../docs/python_select_interpreter.png)
 
-Or if you are using our checked in `settings.json`, just select the default interpreter.
+Or if you are using our checked-in [settings.json](../../.vscode/settings.json), just select the default interpreter.
 
-### Live Reload
+## Live Reload
 
 If you are developing and want live reload, install `ibazel` and run the following command:
 
 ```bash
 ibazel run //backend/python:main
+```
+
+## Running Tests
+
+To run tests, run:
+
+```bash
+bazel test //backend/python:tests
 ```
 
 ## Adding deps

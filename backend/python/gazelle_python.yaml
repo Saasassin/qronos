@@ -5,6 +5,7 @@
 
 manifest:
   modules_mapping:
+    30fcd23745efe32ce681__mypyc: black
     annotated_types: annotated_types
     annotated_types.test_cases: annotated_types
     anyio: anyio
@@ -21,6 +22,43 @@ manifest:
     anyio.streams.tls: anyio
     anyio.to_process: anyio
     anyio.to_thread: anyio
+    black: black
+    black.brackets: black
+    black.cache: black
+    black.comments: black
+    black.concurrency: black
+    black.const: black
+    black.debug: black
+    black.files: black
+    black.handle_ipynb_magics: black
+    black.linegen: black
+    black.lines: black
+    black.mode: black
+    black.nodes: black
+    black.numerics: black
+    black.output: black
+    black.parsing: black
+    black.ranges: black
+    black.report: black
+    black.resources: black
+    black.rusty: black
+    black.schema: black
+    black.strings: black
+    black.trans: black
+    blackd: black
+    blackd.middlewares: black
+    blib2to3: black
+    blib2to3.pgen2: black
+    blib2to3.pgen2.conv: black
+    blib2to3.pgen2.driver: black
+    blib2to3.pgen2.grammar: black
+    blib2to3.pgen2.literals: black
+    blib2to3.pgen2.parse: black
+    blib2to3.pgen2.pgen: black
+    blib2to3.pgen2.token: black
+    blib2to3.pgen2.tokenize: black
+    blib2to3.pygram: black
+    blib2to3.pytree: black
     certifi: certifi
     certifi.core: certifi
     click: click
@@ -254,6 +292,8 @@ manifest:
     idna.intranges: idna
     idna.package_data: idna
     idna.uts46data: idna
+    iniconfig: iniconfig
+    iniconfig.exceptions: iniconfig
     jinja2: jinja2
     jinja2.async_utils: jinja2
     jinja2.bccache: jinja2
@@ -348,8 +388,33 @@ manifest:
     multipart.decoders: python_multipart
     multipart.exceptions: python_multipart
     multipart.multipart: python_multipart
+    mypy_extensions: mypy_extensions
     orjson: orjson
     orjson.orjson: orjson
+    packaging: packaging
+    packaging.markers: packaging
+    packaging.metadata: packaging
+    packaging.requirements: packaging
+    packaging.specifiers: packaging
+    packaging.tags: packaging
+    packaging.utils: packaging
+    packaging.version: packaging
+    pathspec: pathspec
+    pathspec.gitignore: pathspec
+    pathspec.pathspec: pathspec
+    pathspec.pattern: pathspec
+    pathspec.patterns: pathspec
+    pathspec.patterns.gitwildmatch: pathspec
+    pathspec.util: pathspec
+    platformdirs: platformdirs
+    platformdirs.android: platformdirs
+    platformdirs.api: platformdirs
+    platformdirs.macos: platformdirs
+    platformdirs.unix: platformdirs
+    platformdirs.version: platformdirs
+    platformdirs.windows: platformdirs
+    pluggy: pluggy
+    py: pytest
     pydantic: pydantic
     pydantic.alias_generators: pydantic
     pydantic.aliases: pydantic
@@ -722,6 +787,7 @@ manifest:
     pygments.token: pygments
     pygments.unistring: pygments
     pygments.util: pygments
+    pytest: pytest
     rich: rich
     rich.abc: rich
     rich.align: rich
@@ -1188,4 +1254,4 @@ manifest:
     yaml.tokens: PyYAML
   pip_repository:
     name: pip
-integrity: 38ac96a126c0c4c69e6f0cc1d316a2713da86ef83dafd334f74ca0794e4382f8
+integrity: 26d5bc5db79df598c5bdd3e9807020e8eaa8c0e73e362909be39a445ff15437d

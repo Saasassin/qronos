@@ -22,14 +22,14 @@ For the swagger docs, visit [http://localhost:8080/docs](http://localhost:8080/d
 To setup local development environment, run:
 
 ```bash
-bazel run //backend/python:main.venv
+bazel run //backend/python:venv
 ```
 
-This will generate `.main.venv` in the root of the python directory with the full bazel provided python toolchain and dependencies.
+This will generate `.venv` in the root of the python directory with the full bazel provided python toolchain and dependencies.
 
 ### MacOS & VSCode Users
 
-_Do not_ use Finder to specify the interpreter path. If you look carefully there is a blank above "Find" for pasting the relative path to the generated `.main.venv` directory.
+_Do not_ use Finder to specify the interpreter path. If you look carefully there is a blank above "Find" for pasting the relative path to the generated `.venv` directory.
 
 ![image](../../docs/python_select_interpreter.png)
 

@@ -4,8 +4,8 @@
 # gazelle:python_root
 # gazelle:exclude .main.venv
 
-load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
-load("@pip//:requirements.bzl", "all_whl_requirements")
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library", "py_pytest_main", "py_test", "py_venv")
+load("@pip//:requirements.bzl", "all_whl_requirements", "all_requirements")
 load("@rules_multirun//:defs.bzl", "multirun")
 load("@rules_uv//uv:pip.bzl", "pip_compile")
 load("//bazel:python.bzl", "py_setup_gazelle")
@@ -52,7 +52,7 @@ py_binary(
 )
 
 py_library(
-    name = "python",
+    name = "lib",
     srcs = glob(["*.py"]),
     visibility = ["//backend/python:__subpackages__"],
     deps = [
@@ -61,4 +61,33 @@ py_library(
         "@pip//pydantic",
         "@pip//uvicorn",
     ],
+)
+
+py_test(
+    name = "py_test",
+    srcs = glob(["test/**/*.py"]) + [
+        ":__test__",
+    ],
+    data = [".env.test"],
+    main = ":__test__.py",
+    visibility = ["//backend/python:__subpackages__"],
+    deps = [
+        ":__test__",
+        ":lib",
+        "@pip//fastapi",
+        "@pip//pydantic",
+        "@pip//pytest",
+        "@pip//uvicorn",
+    ],
+)
+
+py_pytest_main(
+    name = "__test__",
+    deps = ["@pip//pytest"],
+)
+
+py_venv(
+    name = "venv",
+    imports = ["."],
+    deps = all_requirements,
 )

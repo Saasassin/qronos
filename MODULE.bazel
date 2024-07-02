@@ -155,8 +155,10 @@ use_repo(pip, "pip")
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
 rust.toolchain(
     edition = "2021",
-    versions = ["1.78.0"],
+    versions = ["1.79.0"],
+    sha256s = {"rustc-1.79.0-aarch64-apple-darwin.tar.xz": "0d7890d57a879fdde1866049beb5d47319d9d7acc1968ec0b92d719917c137b3", "clippy-1.79.0-aarch64-apple-darwin.tar.xz": "33e8feb81e31b991ad0e934c83ccd2b1acdafd944a3203e4afb7c7cbacbe41fc", "cargo-1.79.0-aarch64-apple-darwin.tar.xz": "2cc674f17c18b0c01e0e5a8e5caedc26b0f499d2cc10605cf1a838e2cad9ef7d", "llvm-tools-1.79.0-aarch64-apple-darwin.tar.xz": "326166f8862d2ecc10198f9c8bba89dfe64028187ddf417e916dc08c5d3deac7", "rust-std-1.79.0-aarch64-apple-darwin.tar.xz": "89f16f3a6e8705c314c2f59186e0f8695ba43a58805c8450825888371fceaa25"},
 )
+
 use_repo(rust, "rust_toolchains")
 # use_repo(rust, "rust_toolchains")
 

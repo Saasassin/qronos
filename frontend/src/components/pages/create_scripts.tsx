@@ -99,7 +99,7 @@ const CreateScript = () => {
             <button
               type="submit"
               className="form_button"
-              //onClick={handleSubmit}
+              onClick={handleSubmit}
             >
               <svg
                 className="w-5 h-5 text-gray-800 dark:text-white"

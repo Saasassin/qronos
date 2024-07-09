@@ -1,3 +1,6 @@
+//import Editor from "@monaco-editor/react";
+import { QronosMonacoEditor } from "../core/qronos_monaco_editor";
+
 const CreateScript = () => {
   return (
     <>
@@ -71,7 +74,7 @@ const CreateScript = () => {
                 </div>
               </div>
             </div>
-            <div className="sm:col-span-2">
+            {/* <div className="sm:col-span-2">
               <label
                 htmlFor="code_body"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -84,6 +87,13 @@ const CreateScript = () => {
                 className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 placeholder="Script Body"
               ></textarea>
+            </div> */}
+            <div className="sm:col-span-2">
+              <label
+                htmlFor="code_body"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              ></label>
+              <QronosMonacoEditor />
             </div>
           </div>
           <div className="flex flex-col items-center justify-center">
@@ -98,9 +108,9 @@ const CreateScript = () => {
                 viewBox="0 0 24 24"
               >
                 <path
-                  fill-rule="evenodd"
+                  fillRule="evenodd"
                   d="M9 2.221V7H4.221a2 2 0 0 1 .365-.5L8.5 2.586A2 2 0 0 1 9 2.22ZM11 2v5a2 2 0 0 1-2 2H4v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Zm-.293 9.293a1 1 0 0 1 0 1.414L9.414 14l1.293 1.293a1 1 0 0 1-1.414 1.414l-2-2a1 1 0 0 1 0-1.414l2-2a1 1 0 0 1 1.414 0Zm2.586 1.414a1 1 0 0 1 1.414-1.414l2 2a1 1 0 0 1 0 1.414l-2 2a1 1 0 0 1-1.414-1.414L14.586 14l-1.293-1.293Z"
-                  clip-rule="evenodd"
+                  clipRule="evenodd"
                 />
               </svg>
               &nbsp; Save Script

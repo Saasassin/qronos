@@ -1,7 +1,19 @@
-//import Editor from "@monaco-editor/react";
-import { QronosMonacoEditor } from "../core/qronos_monaco_editor";
+import { generateSlug, RandomWordOptions } from "random-word-slugs";
+import { QronosEditor } from "../core/qronos_editor";
 
 const CreateScript = () => {
+  const handleSubmit = () => {
+    console.log("submitting form");
+  };
+
+  /**
+   * Options for generating a random slug.
+   * @see https://www.npmjs.com/package/random-word-slugs
+   */
+  const slugOptions: RandomWordOptions<3> = {
+    format: "kebab",
+  };
+
   return (
     <>
       <div className="bg-white dark:bg-gray-900 p-0 m-0">
@@ -20,7 +32,8 @@ const CreateScript = () => {
                 type="text"
                 name="script_name"
                 id="script_name"
-                placeholder="Type script name"
+                value={generateSlug(3, slugOptions)}
+                onChange={() => {}} // TODO: check for uniqueness
                 className="rounded-lg"
                 required
               ></input>
@@ -74,30 +87,20 @@ const CreateScript = () => {
                 </div>
               </div>
             </div>
-            {/* <div className="sm:col-span-2">
-              <label
-                htmlFor="code_body"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Script Code
-              </label>
-              <textarea
-                id="code_body"
-                rows={22}
-                className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder="Script Body"
-              ></textarea>
-            </div> */}
             <div className="sm:col-span-2">
               <label
                 htmlFor="code_body"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               ></label>
-              <QronosMonacoEditor />
+              <QronosEditor />
             </div>
           </div>
           <div className="flex flex-col items-center justify-center">
-            <button type="submit" className="form_button">
+            <button
+              type="submit"
+              className="form_button"
+              //onClick={handleSubmit}
+            >
               <svg
                 className="w-5 h-5 text-gray-800 dark:text-white"
                 aria-hidden="true"

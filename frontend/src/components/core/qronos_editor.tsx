@@ -78,7 +78,7 @@ export const QronosEditor = () => {
   };
 
   const getDefaultValue = () => {
-    return "// Welcome to Qronos script editor!\n\n function hello(foo: string) {\n\talert('Hello, ' + foo);\n}\n\nhello('world');\n";
+    return "// Welcome to Qronos script editor!\n\nfunction hello(foo: string) {\n\tconsole.log('Hello, ' + foo);\n}\n\nhello('world');\n";
   };
 
   const options = {

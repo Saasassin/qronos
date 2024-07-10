@@ -4,6 +4,8 @@ import { QronosEditor } from "../core/qronos_editor";
 
 const CreateScript = () => {
   useEffect(() => {
+    console.log("CreateScript mounted...");
+
     document.title = "Create Script | Qronos";
 
     // set the script name input value to a random slug

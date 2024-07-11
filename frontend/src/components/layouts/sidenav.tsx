@@ -2,42 +2,34 @@ import { Link } from "react-router-dom";
 
 const SideNav = () => {
   return (
-    <aside
-      className="fixed top-0 left-0 z-40 w-64 h-screen pt-14 transition-transform -translate-x-full bg-white border-r border-gray-200 md:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
-      aria-label="Sidenav"
-      id="drawer-navigation"
-    >
-      <div className="overflow-y-auto py-5 px-3 h-full bg-white dark:bg-gray-800">
-        <ul className="space-y-2">
+    <>
+      <div className="fixed top-16 left-0 w-64 h-full bg-base-200 shadow-md">
+        <ul className="menu p-4">
           <li>
-            <Link
-              to="/"
-              className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-            >
+            <Link to="/">
               <svg
-                aria-hidden="true"
-                className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                fill="currentColor"
-                viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-                <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                />
               </svg>
-              <span className="ml-3">Overview</span>
+              Dashboard
             </Link>
           </li>
           <li>
-            <Link
-              to="/create_script"
-              className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-            >
+            <Link to="/create_script">
               <svg
-                className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                className="h-5 w-5"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
                 fill="none"
                 viewBox="0 0 24 24"
               >
@@ -45,24 +37,17 @@ const SideNav = () => {
                   stroke="currentColor"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
+                  strokeWidth="2"
                   d="m8 8-4 4 4 4m8 0 4-4-4-4m-2-3-4 14"
                 />
               </svg>
-
-              <span className="flex-1 ml-3 text-left whitespace-nowrap">
-                Create
-              </span>
+              Create
             </Link>
           </li>
-
           <li>
-            <Link
-              to="/browse_scripts"
-              className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
-            >
+            <Link to="/view_history">
               <svg
-                className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                className="h-5 w-5"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -72,25 +57,19 @@ const SideNav = () => {
               >
                 <path
                   stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 19V6a1 1 0 0 1 1-1h4.032a1 1 0 0 1 .768.36l1.9 2.28a1 1 0 0 0 .768.36H16a1 1 0 0 1 1 1v1M3 19l3-8h15l-3 8H3Z"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m8 9 3 3-3 3m5 0h3M4 19h16a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Z"
                 />
               </svg>
-              <span className="flex-1 ml-3 text-left whitespace-nowrap">
-                Browse
-              </span>
+              Logs
             </Link>
           </li>
-
           <li>
-            <Link
-              to="/view_history"
-              className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
-            >
+            <Link to="/system_settings">
               <svg
-                className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                className="h-5 w-5"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -100,118 +79,70 @@ const SideNav = () => {
               >
                 <path
                   stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"
+                  stroke-linecap="round"
+                  stroke-width="2"
+                  d="M6 4v10m0 0a2 2 0 1 0 0 4m0-4a2 2 0 1 1 0 4m0 0v2m6-16v2m0 0a2 2 0 1 0 0 4m0-4a2 2 0 1 1 0 4m0 0v10m6-16v10m0 0a2 2 0 1 0 0 4m0-4a2 2 0 1 1 0 4m0 0v2"
                 />
               </svg>
-              <span className="flex-1 ml-3 text-left whitespace-nowrap">
-                Run History
-              </span>
+              Settings
             </Link>
           </li>
         </ul>
-        <ul className="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
-          <li>
-            <a
-              href="#"
-              className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
-            >
-              <svg
-                aria-hidden="true"
-                className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
-                <path
-                  fillRule="evenodd"
-                  d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
-              <span className="ml-3">Docs</span>
-            </a>
-          </li>
 
-          <li>
-            <a
-              href="#"
-              className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
-            >
-              <svg
-                aria-hidden="true"
-                className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-2 0c0 .993-.241 1.929-.668 2.754l-1.524-1.525a3.997 3.997 0 00.078-2.183l1.562-1.562C15.802 8.249 16 9.1 16 10zm-5.165 3.913l1.58 1.58A5.98 5.98 0 0110 16a5.976 5.976 0 01-2.516-.552l1.562-1.562a4.006 4.006 0 001.789.027zm-4.677-2.796a4.002 4.002 0 01-.041-2.08l-.08.08-1.53-1.533A5.98 5.98 0 004 10c0 .954.223 1.856.619 2.657l1.54-1.54zm1.088-6.45A5.974 5.974 0 0110 4c.954 0 1.856.223 2.657.619l-1.54 1.54a4.002 4.002 0 00-2.346.033L7.246 4.668zM12 10a2 2 0 11-4 0 2 2 0 014 0z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
-              <span className="ml-3">Help</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-      <div className="hidden absolute bottom-0 left-0 justify-center p-4 space-x-4 w-full lg:flex bg-white dark:bg-gray-800 z-20">
-        <a
-          data-tooltip-target="tooltip-status"
-          href="/system_status"
-          className="inline-flex justify-center p-2 text-gray-500 rounded cursor-pointer dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
-        >
-          <svg
-            aria-hidden="true"
-            className="w-6 h-6"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
+        {/* <div>
+          <a
+            data-tooltip-target="tooltip-status"
+            href="/system_status"
+            className="inline-flex justify-center p-2 text-gray-500 rounded cursor-pointer dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
           >
-            <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"></path>
-          </svg>{" "}
+            <svg
+              aria-hidden="true"
+              className="w-6 h-6"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"></path>
+            </svg>{" "}
+            <div
+              id="tooltip-status"
+              role="tooltip"
+              className="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip"
+            >
+              System Status
+              <div className="tooltip-arrow" data-popper-arrow></div>
+            </div>
+          </a>
+          <a
+            href="/system_settings"
+            data-tooltip-target="tooltip-settings"
+            className="inline-flex justify-center p-2 text-gray-500 rounded cursor-pointer dark:text-gray-400 dark:hover:text-white hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-600"
+          >
+            <svg
+              aria-hidden="true"
+              className="w-6 h-6"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fillRule="evenodd"
+                d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
+                clipRule="evenodd"
+              ></path>
+            </svg>
+          </a>
           <div
-            id="tooltip-status"
+            id="tooltip-settings"
             role="tooltip"
             className="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip"
           >
-            System Status
+            System Settings
             <div className="tooltip-arrow" data-popper-arrow></div>
           </div>
-        </a>
-        <a
-          href="/system_settings"
-          data-tooltip-target="tooltip-settings"
-          className="inline-flex justify-center p-2 text-gray-500 rounded cursor-pointer dark:text-gray-400 dark:hover:text-white hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-600"
-        >
-          <svg
-            aria-hidden="true"
-            className="w-6 h-6"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fillRule="evenodd"
-              d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
-              clipRule="evenodd"
-            ></path>
-          </svg>
-        </a>
-        <div
-          id="tooltip-settings"
-          role="tooltip"
-          className="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip"
-        >
-          System Settings
-          <div className="tooltip-arrow" data-popper-arrow></div>
-        </div>
+        </div> */}
       </div>
-    </aside>
+    </>
   );
 };
 

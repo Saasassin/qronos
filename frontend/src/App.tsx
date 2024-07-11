@@ -1,5 +1,4 @@
 import { Route, Routes } from "react-router-dom";
-import Footer from "./components/layouts/footer";
 import Header from "./components/layouts/header";
 import SideNav from "./components/layouts/sidenav";
 import BrowseScripts from "./components/pages/browse_scripts";
@@ -12,7 +11,6 @@ import SystemStatus from "./components/pages/system_status";
 const App = () => {
   return (
     <>
-      {/* <Flowbite> */}
       <Header />
       <SideNav />
       <main>
@@ -26,9 +24,8 @@ const App = () => {
           <Route path="/system_status" element={<SystemStatus />} />
           {/* <Route path="*" element={<NoMatch />} /> */}
         </Routes>
-        <Footer />
+        {/* <Footer /> */}
       </main>
-      {/* </Flowbite> */}
     </>
   );
 };

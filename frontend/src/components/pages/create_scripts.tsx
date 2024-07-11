@@ -1,12 +1,9 @@
-import { initFlowbite } from "flowbite";
 import { generateSlug } from "random-word-slugs";
 import { useEffect } from "react";
 import { QronosEditor } from "../core/qronos_editor";
 
 const CreateScript = () => {
   useEffect(() => {
-    initFlowbite();
-
     console.log("CreateScript mounted...");
 
     document.title = "Create Script | Qronos";
@@ -24,8 +21,9 @@ const CreateScript = () => {
 
   return (
     <>
-      <div className="bg-white dark:bg-gray-900 p-0 m-0">
+      <div className="ml-64 mt-16 p-4">
         <h1>Create Script</h1>
+        <button className="btn">Button</button>
 
         <form>
           <div className="grid gap-4 sm:grid-cols-3 sm:gap-6">

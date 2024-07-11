@@ -1,9 +1,12 @@
+import { initFlowbite } from "flowbite";
 import { generateSlug } from "random-word-slugs";
 import { useEffect } from "react";
 import { QronosEditor } from "../core/qronos_editor";
 
 const CreateScript = () => {
   useEffect(() => {
+    initFlowbite();
+
     console.log("CreateScript mounted...");
 
     document.title = "Create Script | Qronos";

@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",
-    "flowbite-react": "^0.10.1",
     "io-ts": "^2.2.21",
     "monaco-editor": "^0.50.0",
     "random-word-slugs": "^0.1.7",

@@ -37,3 +37,7 @@ h4 {
 h5 {
   @apply text-lg mb-4 h-7;
 }
+
+.react-icon-button {
+  @apply h-5 w-5;
+}

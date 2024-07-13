@@ -17,7 +17,7 @@ This will start the server on [http://localhost:8080](http://localhost:8080). A 
 
 For the swagger docs, visit [http://localhost:8080/docs](http://localhost:8080/docs).
 
-# Local Dev
+# Configuring Local Dev
 
 To setup local development environment, run:
 

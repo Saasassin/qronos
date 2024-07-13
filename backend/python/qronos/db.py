@@ -24,8 +24,7 @@ class Script(SQLModel, table=True, extend_existing=True):
     __tablename__ = "script"
     __table_args__ = {"extend_existing": True}
     id: UUID = Field(default=None, primary_key=True)
-    name: str = Field(sa_column=Column("name", String, unique=True, nullable=False))
-    description: str = Field(nullable=True)
+    script_name: str = Field(sa_column=Column("script_name", String, unique=True, nullable=False))
     script_type: ScriptType = Field(sa_column=Column(Enum(ScriptType), nullable=False))
     current_version_id: UUID = Field(default=None, foreign_key="script_version.id", nullable=False)
     updated_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))

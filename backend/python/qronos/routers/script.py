@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends
 from qronos.db import Script, ScriptVersion, get_session
 from sqlmodel import Session, select
+import uuid
+from uuid import UUID
 
 router = APIRouter()
 
@@ -21,12 +23,18 @@ async def read_script(script_id: str, session: Session = Depends(get_session)):
 
 
 @router.post("/script", tags=["Script Methods"], response_model=Script)
-async def create_script(script: Script, session: Session = Depends(get_session)):
+async def create_script(script: Script, script_version: ScriptVersion, session: Session = Depends(get_session)):
     """
     Creates a new script and a new version.
     """
+    script.id = uuid.uuid4()
+
+    script_version.id = uuid.uuid4()
+    script.current_version_id = script_version.id
+    script_version.script_id = script.id
+    
     session.add(script)
-    # TODO: add versioning
+    session.add(script_version)
     session.commit()
     session.refresh(script)
     return script

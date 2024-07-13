@@ -1,5 +1,6 @@
 import { IconContext } from "react-icons";
-import { IoCreateOutline, IoList } from "react-icons/io5";
+import { FaRegChartBar } from "react-icons/fa";
+import { IoCreateOutline, IoList, IoSettingsOutline } from "react-icons/io5";
 import { RxDashboard } from "react-icons/rx";
 import { Link } from "react-router-dom";
 
@@ -34,44 +35,17 @@ const SideNav = () => {
           </li>
           <li>
             <Link to="/view_history">
-              <svg
-                className="h-5 w-5"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                />
-              </svg>
+              <IconContext.Provider value={{ className: "react-icon-button" }}>
+                <FaRegChartBar />
+              </IconContext.Provider>
               Logs
             </Link>
           </li>
           <li>
             <Link to="/system_settings">
-              <svg
-                className="h-5 w-5"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-width="2"
-                  d="M6 4v10m0 0a2 2 0 1 0 0 4m0-4a2 2 0 1 1 0 4m0 0v2m6-16v2m0 0a2 2 0 1 0 0 4m0-4a2 2 0 1 1 0 4m0 0v10m6-16v10m0 0a2 2 0 1 0 0 4m0-4a2 2 0 1 1 0 4m0 0v2"
-                />
-              </svg>
+              <IconContext.Provider value={{ className: "react-icon-button" }}>
+                <IoSettingsOutline />
+              </IconContext.Provider>
               Settings
             </Link>
           </li>

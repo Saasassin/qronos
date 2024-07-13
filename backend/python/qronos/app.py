@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from qronos.routers import default, history, runner, script, settings, user
+from fastapi.middleware.cors import CORSMiddleware
 
 tags_metadata = [
     {"name": "Runner Methods"},
@@ -29,6 +30,8 @@ def qronos_openapi_schema():
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
+# TODO: this needs to be an EVN var or something?
+origins = ["*"]
 
 app = FastAPI(openapi_tags=tags_metadata)
 app.include_router(script.router)
@@ -37,5 +40,14 @@ app.include_router(history.router)
 app.include_router(user.router)
 app.include_router(settings.router)
 app.include_router(default.router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 app.openapi = qronos_openapi_schema

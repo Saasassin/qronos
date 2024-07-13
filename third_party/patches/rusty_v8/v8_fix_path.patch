@@ -1,0 +1,22 @@
+diff --git a/build.rs b/build.rs
+index 8556569..d61ccc3 100644
+--- a/build.rs
++++ b/build.rs
+@@ -654,7 +654,6 @@ fn copy_archive(url: &str, filename: &Path) {
+ }
+ 
+ fn print_link_flags() {
+-  println!("cargo:rustc-link-lib=static=rusty_v8");
+   let should_dyn_link_libcxx = env::var("CARGO_FEATURE_USE_CUSTOM_LIBCXX")
+     .is_err()
+     || env::var("GN_ARGS").map_or(false, |gn_args| {
+@@ -707,8 +706,7 @@ fn print_link_flags() {
+ fn print_prebuilt_src_binding_path() {
+   let target = env::var("TARGET").unwrap();
+   let profile = prebuilt_profile();
+-  let src_binding_path = get_dirs(None)
+-    .root
++  let src_binding_path = Path::new("..")
+     .join("gen")
+     .join(format!("src_binding_{}_{}.rs", profile, target));
+   println!(

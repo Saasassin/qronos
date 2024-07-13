@@ -1,4 +1,47 @@
 load("@@rules_gzip~//gzip/decompress:defs.bzl", "gzip_decompress")
+# load("@rules_rust//bindgen:defs.bzl", "rust_bindgen")
+
+# filegroup(
+#     name = "foo",
+#     srcs = glob(
+#         allow_empty = True,
+#         include = ["**"],
+#         exclude = [
+#             "**/* *",
+#             ".tmp_git_root/**/*",
+#             "BUILD",
+#             "BUILD.bazel",
+#             "WORKSPACE",
+#             "WORKSPACE.bazel",
+#         ],
+#     ),
+# )
+
+# cc_library(
+#     name = "v8_hdrs",
+#     srcs = ["src/binding.cc"],
+#     # srcs = glob([
+#     #     "**/*.cc",
+#     #     "**/*.cpp",
+#     # ]),
+#     hdrs = glob([
+#         "**/*.h",
+#         "**/*.hpp",
+#     ]),
+#     copts = [
+#         # "-Iexternal/{}/v8/include".format(repo_name()),
+#         # "-Iexternal/{}/src".format(repo_name()),
+#         "-Iv8/include",
+#         "-Isrc",
+#     ],
+#     # strip_include_prefix = "v8/include",
+#     visibility = ["//visibility:public"],
+# )
+
+# rust_bindgen(
+#     name = "v8_bindings",
+#     # cc_lib =
+# )
 
 config_setting(
     name = "linux",

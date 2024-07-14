@@ -94,6 +94,17 @@ const CreateScript = () => {
     formatOnPaste: true,
   };
 
+  // const [formDate, setFormData] = useState<Script>({
+  //   id: undefined,
+  //   script_name: generateSlug(3, { format: "kebab" }),
+  //   script_type: "RUNNABLE",
+  //   script_version: {
+  //     code_body:
+  //       "// Welcome to Qronos script editor!\n\nfunction hello(foo: string) {\n\tconsole.log('Hello, ' + foo);\n}\n\nhello('world');\n",
+  //   },
+  // });
+  // };
+
   const [formData, setFormData] = useState({
     id: undefined,
     script_name: generateSlug(3, { format: "kebab" }),
@@ -303,7 +314,6 @@ const CreateScript = () => {
                   >
                     <VscSave />
                   </IconContext.Provider>
-                  {/* TODO: Save should be disabled unless dirty. */}
                   Save
                 </button>
               </div>
@@ -361,7 +371,6 @@ const CreateScript = () => {
                 >
                   <VscSave />
                 </IconContext.Provider>
-                {/* TODO: Save should be disabled unless dirty. */}
                 Save
               </button>
             </div>

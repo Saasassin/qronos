@@ -44,7 +44,7 @@ export const ScriptVersion = t.type({
 export type ScriptVersion = t.TypeOf<typeof ScriptVersion>;
 
 export const Script = t.type({
-  id: t.number,
+  id: t.union([t.string, t.undefined]),
   script_name: t.string,
   script_version: ScriptVersion, // most recent code. DB should just have a code_id that FKs to the Code table.
   script_type: t.string,

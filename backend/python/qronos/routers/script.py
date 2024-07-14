@@ -39,17 +39,21 @@ async def create_script(script: Script, script_version: ScriptVersion, session: 
     session.refresh(script)
     return script
 
-
 @router.put("/script/{script_id}", tags=["Script Methods"], response_model=Script | None)
-async def update_script(script_id: str, script: Script, session: Session = Depends(get_session)):
+async def update_script(script_id: str, script: Script, script_version: ScriptVersion, session: Session = Depends(get_session)):
     """
     Updates an existing script. If the code is different, a new version is created.
     """
     existing_script = session.exec(select(Script).where(Script.id == script_id)).first()
     if existing_script:
-        existing_script.name = script.name
-        existing_script.code = script.code
-        # TODO: add versioning
+        existing_script.script_name = script.script_name
+        existing_script.script_type = script.script_type
+
+        script_version.id = uuid.uuid4()
+        script_version.script_id = script_id
+        session.add(script_version)
+        existing_script.current_version_id = script_version.id
+
         session.add(existing_script)
         session.commit()
         session.refresh(existing_script)

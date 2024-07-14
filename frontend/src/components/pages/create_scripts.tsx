@@ -4,29 +4,30 @@ import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { VscOpenPreview, VscSave } from "react-icons/vsc";
+import AlertComponent, { AlertType } from "../core/alert";
 import { QronosEditor } from "../core/qronos_editor";
 
 const CreateScript = () => {
   const monaco = useMonaco();
 
   const [formData, setFormData] = useState({
-    script_name: "",
-    script_type: "",
+    id: undefined,
+    script_name: generateSlug(3, { format: "kebab" }),
+    script_type: "RUNNABLE",
     script_version: {
       code_body: "",
     },
   });
 
+  // initialize alert state
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState(AlertType.SUCCESS);
+
   useEffect(() => {
     console.log("CreateScript mounted...");
 
     document.title = "Create Script | Qronos";
-
-    // set the script name input value to a random slug
-    const scriptNameInput = document.getElementById(
-      "script_name"
-    ) as HTMLInputElement;
-    scriptNameInput.value = generateSlug(3, { format: "kebab" });
 
     // do conditional chaining
     monaco?.languages.typescript.javascriptDefaults.setEagerModelSync(true);
@@ -36,41 +37,91 @@ const CreateScript = () => {
     }
   }, [monaco]);
 
+  const displaySuccessAlert = (message: string) => {
+    setAlertType(AlertType.SUCCESS);
+    setAlertMessage(message);
+    setAlertVisible(true);
+    setTimeout(() => {
+      setAlertVisible(false);
+    }, 3000);
+  };
+
+  const displayErrorAlert = (message: string) => {
+    setAlertType(AlertType.ERROR);
+    setAlertMessage(message);
+    setAlertVisible(true);
+    setTimeout(() => {
+      setAlertVisible(false);
+    }, 3000);
+  };
+
+  const handleChange = (event: { target: { name: any; value: any } }) => {
+    const { name, value } = event.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
   const handleSubmit = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
 
     const code_body = monaco?.editor.getModels()[0].getValue() ?? "";
 
-    const Sdata = {
+    const form_submit_data = {
       script: {
-        script_name: (
-          document.getElementById("script_name") as HTMLInputElement
-        ).value,
-        script_type: (
-          document.getElementById("script_type") as HTMLSelectElement
-        ).value,
+        id: formData.id,
+        script_name: formData.script_name,
+        script_type: formData.script_type,
       },
       script_version: {
         code_body: code_body,
       },
     };
 
+    console.log("Submitting data: ", form_submit_data);
+
     try {
-      const response = await fetch("http://localhost:8080/script", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(Sdata),
-      });
+      if (!formData.id) {
+        // CREATE
+        const response = await fetch("http://localhost:8080/script", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(form_submit_data),
+        });
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+        const responseData = await response.json();
+
+        if (response.ok) {
+          displaySuccessAlert("Script Created Successfully!");
+        } else {
+          displayErrorAlert("Script Creation Error!");
+        }
+
+        // set formData.id to the new id
+        setFormData({ ...formData, id: responseData.id });
+      } else {
+        // UPDATE
+        const response = await fetch(
+          `http://localhost:8080/script/${formData.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(form_submit_data),
+          }
+        );
+
+        const data = await response.json();
+
+        if (response.ok) {
+          displaySuccessAlert("Script Updated Successfully!");
+        } else {
+          displayErrorAlert("Script Update Error!");
+        }
       }
-
-      const data = await response.json();
-      console.log("Success:", data);
     } catch (error) {
+      displayErrorAlert("Script Persistence Error!");
       console.error("Error:", error);
     }
   };
@@ -88,7 +139,8 @@ const CreateScript = () => {
                 className="input input-bordered w-full max-w-xs"
                 name="script_name"
                 id="script_name"
-                //onChange={handleChange}
+                value={formData.script_name}
+                onChange={handleChange}
                 required
               ></input>
             </div>
@@ -98,7 +150,8 @@ const CreateScript = () => {
                   className="select select-bordered w-full max-w-xs"
                   id="script_type"
                   name="script_type"
-                  //                  onChange={handleChange}
+                  value={formData.script_type}
+                  onChange={handleChange}
                   required
                 >
                   <option value="RUNNABLE">Runnable Script</option>
@@ -193,7 +246,12 @@ const CreateScript = () => {
                 Preview
               </button>
 
-              <button type="submit" className="btn btn-primary join-item">
+              <button
+                type="button"
+                className="btn btn-primary join-item"
+                onClick={handleSubmit}
+              >
+                {" "}
                 <IconContext.Provider
                   value={{ className: "react-icon-button" }}
                 >
@@ -205,6 +263,12 @@ const CreateScript = () => {
             </div>
           </div>
         </form>
+        <AlertComponent
+          message={alertMessage}
+          message_type={alertType}
+          visible={alertVisible}
+          onClose={() => setAlertVisible(false)}
+        />
       </div>
     </>
   );

@@ -1,21 +1,106 @@
-import { useMonaco } from "@monaco-editor/react";
 import { generateSlug } from "random-word-slugs";
-import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { VscOpenPreview, VscSave } from "react-icons/vsc";
 import AlertComponent, { AlertType } from "../core/alert";
-import { QronosEditor } from "../core/qronos_editor";
+
+import Editor, { loader } from "@monaco-editor/react";
+import * as monaco from "monaco-editor";
+import { useEffect, useRef, useState } from "react";
+
+// BEGIN: Needed in Vite environments
+import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
+import cssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
+import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
+import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
+import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
+
+self.MonacoEnvironment = {
+  getWorker(_, label) {
+    if (label === "json") {
+      console.log("Returning json worker");
+      return new jsonWorker();
+    }
+    if (label === "css" || label === "scss" || label === "less") {
+      console.log("Returning css worker");
+      return new cssWorker();
+    }
+    if (label === "html" || label === "handlebars" || label === "razor") {
+      console.log("Returning html worker");
+      return new htmlWorker();
+    }
+    if (label === "typescript" || label === "javascript") {
+      console.log("Returning ts worker");
+      return new tsWorker();
+    }
+    return new editorWorker();
+  },
+};
+
+loader.config({ monaco });
+loader.init().then((monaco) => {
+  monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+    noSemanticValidation: false,
+    noSyntaxValidation: false,
+  });
+  monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+    target: monaco.languages.typescript.ScriptTarget.ES2020,
+    allowNonTsExtensions: true,
+  });
+});
+// END: Needed in Vite environments
 
 const CreateScript = () => {
-  const monaco = useMonaco();
+  const [editorValue, setEditorValue] = useState<string>("");
+
+  const monacoRef = useRef(null);
+  const editorRef = useRef<any>(null);
+
+  /**
+   * This is a callback function that is called when the editor is mounted.
+   */
+  const handleEditorDidMount = (mountedEditor: any, mountedMonaco: any) => {
+    console.log("editor mounted");
+
+    editorRef.current = mountedEditor;
+    monacoRef.current = mountedMonaco;
+  };
+
+  // This is a callback function that is called when the editor content changes.
+  const handleEditorChange = (value: any) => {
+    formData.script_version.code_body = value;
+    setEditorValue(value);
+    setIsDirtyForm(true);
+  };
+
+  const handleEditorValidation = (markers: any) => {
+    console.log("markers: ", markers);
+    // TODO: if markers.length > 0, display error alert before saving.
+  };
+
+  // TODO: move some of these to settings.
+  const editorOptions = {
+    automaticLayout: true, //
+    glyphMargin: true, // margin for symbols like error and warning
+    lineNumbers: "on",
+    folding: true,
+    minimap: { enabled: true },
+    wordWrap: "on",
+    wrappingIndent: "indent",
+    wrappingStrategy: "advanced",
+    fontSize: 14,
+    lineHeight: 16,
+    formatOnType: true,
+    formatOnPaste: true,
+  };
 
   const [formData, setFormData] = useState({
     id: undefined,
     script_name: generateSlug(3, { format: "kebab" }),
     script_type: "RUNNABLE",
     script_version: {
-      code_body: "",
+      code_body:
+        "// Welcome to Qronos script editor!\n\nfunction hello(foo: string) {\n\tconsole.log('Hello, ' + foo);\n}\n\nhello('world');\n",
     },
   });
 
@@ -24,18 +109,12 @@ const CreateScript = () => {
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState(AlertType.SUCCESS);
 
+  // initialize save button dirty state
+  const [isDirty, setIsDirtyForm] = useState(false);
+
   useEffect(() => {
-    console.log("CreateScript mounted...");
-
     document.title = "Create Script | Qronos";
-
-    // do conditional chaining
-    monaco?.languages.typescript.javascriptDefaults.setEagerModelSync(true);
-    // or make sure that it exists by other ways
-    if (monaco) {
-      console.log("here is the monaco instance:", monaco);
-    }
-  }, [monaco]);
+  });
 
   const displaySuccessAlert = (message: string) => {
     setAlertType(AlertType.SUCCESS);
@@ -55,15 +134,17 @@ const CreateScript = () => {
     }, 3000);
   };
 
+  // This handles changes in the form fields, but NOT the editor.
   const handleChange = (event: { target: { name: any; value: any } }) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
+    setIsDirtyForm(true);
   };
 
   const handleSubmit = async (event: { preventDefault: () => void }) => {
-    event.preventDefault();
+    setIsDirtyForm(false);
 
-    const code_body = monaco?.editor.getModels()[0].getValue() ?? "";
+    event.preventDefault();
 
     const form_submit_data = {
       script: {
@@ -72,7 +153,7 @@ const CreateScript = () => {
         script_type: formData.script_type,
       },
       script_version: {
-        code_body: code_body,
+        code_body: formData.script_version.code_body,
       },
     };
 
@@ -112,7 +193,7 @@ const CreateScript = () => {
           }
         );
 
-        const data = await response.json();
+        //const data = await response.json();
 
         if (response.ok) {
           displaySuccessAlert("Script Updated Successfully!");
@@ -212,7 +293,9 @@ const CreateScript = () => {
 
                 <button
                   type="button"
-                  className="btn btn-primary join-item"
+                  className={`btn btn-primary join-item ${
+                    isDirty ? "" : "btn-disabled"
+                  }`}
                   onClick={handleSubmit}
                 >
                   <IconContext.Provider
@@ -231,7 +314,26 @@ const CreateScript = () => {
                 htmlFor="code_body"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               ></label>
-              <QronosEditor />
+              <Editor
+                height="60vh"
+                width="100%"
+                options={editorOptions}
+                theme="vs-dark"
+                loading={<div>Reticulating Splines...</div>}
+                defaultLanguage="typescript"
+                defaultValue={formData.script_version.code_body}
+                name="code_body"
+                id="code_body"
+                onChange={(value: any) => {
+                  handleEditorChange(value);
+                }}
+                onMount={(editor: any, monaco: any) => {
+                  handleEditorDidMount(editor, monaco);
+                }}
+                onValidate={(markers: any) => {
+                  handleEditorValidation(markers);
+                }}
+              />{" "}
             </div>
           </div>
 
@@ -248,7 +350,9 @@ const CreateScript = () => {
 
               <button
                 type="button"
-                className="btn btn-primary join-item"
+                className={`btn btn-primary join-item ${
+                  isDirty ? "" : "btn-disabled"
+                }`}
                 onClick={handleSubmit}
               >
                 {" "}

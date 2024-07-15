@@ -14,6 +14,7 @@ import cssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
 import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
 import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
+import { Script } from "../../types/qronos";
 
 self.MonacoEnvironment = {
   getWorker(_, label) {
@@ -94,24 +95,17 @@ const CreateScript = () => {
     formatOnPaste: true,
   };
 
-  // const [formDate, setFormData] = useState<Script>({
-  //   id: undefined,
-  //   script_name: generateSlug(3, { format: "kebab" }),
-  //   script_type: "RUNNABLE",
-  //   script_version: {
-  //     code_body:
-  //       "// Welcome to Qronos script editor!\n\nfunction hello(foo: string) {\n\tconsole.log('Hello, ' + foo);\n}\n\nhello('world');\n",
-  //   },
-  // });
-  // };
-
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Script>({
     id: undefined,
     script_name: generateSlug(3, { format: "kebab" }),
     script_type: "RUNNABLE",
+    created_at: undefined,
+    updated_at: undefined,
     script_version: {
+      id: undefined,
       code_body:
         "// Welcome to Qronos script editor!\n\nfunction hello(foo: string) {\n\tconsole.log('Hello, ' + foo);\n}\n\nhello('world');\n",
+      created_at: undefined,
     },
   });
 

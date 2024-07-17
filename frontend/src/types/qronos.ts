@@ -42,6 +42,7 @@ export const ScriptVersion = t.type({
 });
 
 export type ScriptVersion = t.TypeOf<typeof ScriptVersion>;
+export type ScriptVersions = ScriptVersion[];
 
 export const Script = t.type({
   id: t.union([t.string, t.undefined]),
@@ -53,6 +54,8 @@ export const Script = t.type({
 });
 
 export type Script = t.TypeOf<typeof Script>;
+
+export type Scripts = Script[];
 
 export const Job = t.type({
   id: t.number,

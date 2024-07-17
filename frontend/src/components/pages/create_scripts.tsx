@@ -15,6 +15,7 @@ import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
 import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
 import { Script } from "../../types/qronos";
+import { saveOrUpdateScript } from "../services/Client";
 
 self.MonacoEnvironment = {
   getWorker(_, label) {
@@ -151,61 +152,18 @@ const CreateScript = () => {
 
     event.preventDefault();
 
-    const form_submit_data = {
-      script: {
-        id: formData.id,
-        script_name: formData.script_name,
-        script_type: formData.script_type,
-      },
-      script_version: {
-        code_body: formData.script_version.code_body,
-      },
-    };
-
-    console.log("Submitting data: ", form_submit_data);
+    console.log("Submitting data: ", formData);
 
     try {
-      if (!formData.id) {
-        // CREATE
-        const response = await fetch("http://localhost:8080/script", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(form_submit_data),
-        });
-
-        const responseData = await response.json();
-
+      saveOrUpdateScript(formData).then(async (response) => {
         if (response.ok) {
-          displaySuccessAlert("Script Created Successfully!");
-        } else {
-          displayErrorAlert("Script Creation Error!");
-        }
-
-        // set formData.id to the new id
-        setFormData({ ...formData, id: responseData.id });
-      } else {
-        // UPDATE
-        const response = await fetch(
-          `http://localhost:8080/script/${formData.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(form_submit_data),
-          }
-        );
-
-        //const data = await response.json();
-
-        if (response.ok) {
+          const responseData = await response.json();
+          setFormData({ ...formData, id: responseData.id });
           displaySuccessAlert("Script Updated Successfully!");
         } else {
-          displayErrorAlert("Script Update Error!");
+          displayErrorAlert("Script Save Error!" + response.statusText);
         }
-      }
+      });
     } catch (error) {
       displayErrorAlert("Script Persistence Error!");
       console.error("Error:", error);

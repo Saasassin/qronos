@@ -22,7 +22,7 @@ async def read_script(script_id: str, session: Session = Depends(get_session)):
     return session.exec(select(Script).where(Script.id == script_id)).first()
 
 
-@router.post("/script", tags=["Script Methods"], response_model=Script)
+@router.post("/scripts", tags=["Script Methods"], response_model=Script)
 async def create_script(script: Script, script_version: ScriptVersion, session: Session = Depends(get_session)):
     """
     Creates a new script and a new version.
@@ -39,7 +39,7 @@ async def create_script(script: Script, script_version: ScriptVersion, session: 
     session.refresh(script)
     return script
 
-@router.put("/script/{script_id}", tags=["Script Methods"], response_model=Script | None)
+@router.put("/scripts/{script_id}", tags=["Script Methods"], response_model=Script | None)
 async def update_script(script_id: str, script: Script, script_version: ScriptVersion, session: Session = Depends(get_session)):
     """
     Updates an existing script. If the code is different, a new version is created.
@@ -61,7 +61,7 @@ async def update_script(script_id: str, script: Script, script_version: ScriptVe
     return None
 
 
-@router.delete("/script/{script_id}", tags=["Script Methods"], response_model=Script | None)
+@router.delete("/scripts/{script_id}", tags=["Script Methods"], response_model=Script | None)
 async def delete_script(script_id: str, session: Session = Depends(get_session)):
     """
     Deletes a script and all of its versions.

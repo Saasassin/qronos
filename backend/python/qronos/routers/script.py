@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Depends
-from qronos.db import Script, ScriptVersion, get_session
-from sqlmodel import Session, select
 import uuid
 from uuid import UUID
+
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel
+from qronos.db import Script, ScriptVersion, get_session
+from sqlmodel import Session, select
 
 router = APIRouter()
 
@@ -14,14 +16,20 @@ async def read_scripts(session: Session = Depends(get_session), skip: int = 0, l
     return results.all()
 
 
-@router.get("/scripts/{script_id}", tags=["Script Methods"], response_model=Script  | None)
+class ScriptWithVersion(BaseModel):
+    script: Script
+    script_version: ScriptVersion
+
+
+@router.get("/scripts/{script_id}", tags=["Script Methods"], response_model=ScriptWithVersion)
 async def read_script(script_id: str, session: Session = Depends(get_session)):
     """
     Fetches a script by its ID with the ScriptVersion.
     """
     statement = select(Script, ScriptVersion).where(Script.id == script_id)
-    result = session.exec(statement).first()
-    return result
+    [script, script_version] = session.exec(statement).first()
+    return ScriptWithVersion(script=script, script_version=script_version)
+
 
 @router.post("/scripts", tags=["Script Methods"], response_model=Script)
 async def create_script(script: Script, script_version: ScriptVersion, session: Session = Depends(get_session)):
@@ -31,17 +39,20 @@ async def create_script(script: Script, script_version: ScriptVersion, session: 
     script.id = uuid.uuid4()
 
     script_version.id = uuid.uuid4()
-    #script.current_version_id = script_version.id
+    # script.current_version_id = script_version.id
     script_version.script_id = script.id
-    
+
     session.add(script)
     session.add(script_version)
     session.commit()
     session.refresh(script)
     return script
 
+
 @router.put("/scripts/{script_id}", tags=["Script Methods"], response_model=Script | None)
-async def update_script(script_id: str, script: Script, script_version: ScriptVersion, session: Session = Depends(get_session)):
+async def update_script(
+    script_id: str, script: Script, script_version: ScriptVersion, session: Session = Depends(get_session)
+):
     """
     Updates an existing script. If the code is different, a new version is created.
     """

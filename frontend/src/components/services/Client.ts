@@ -1,26 +1,28 @@
-import { Script } from "../../types/qronos";
+import { ScriptWithVersion } from "../../types/qronos";
 
 const BASE_URI = import.meta.env.QRONOS_API_URL || "http://?????????????"; // TODO: Fill in the correct URL for default
 
-export const saveOrUpdateScript = async (script: Script) => {
+export const saveOrUpdateScript = async (
+  script_with_version: ScriptWithVersion
+) => {
   const post_body = {
     script: {
-      id: script.id,
-      script_name: script.script_name,
-      script_type: script.script_type,
+      id: script_with_version.script.id,
+      script_name: script_with_version.script.script_name,
+      script_type: script_with_version.script.script_type,
     },
     script_version: {
-      code_body: script.script_version.code_body,
+      code_body: script_with_version.script_version.code_body,
     },
   };
 
   let target_uri = `${BASE_URI}/scripts`;
-  if (script.id) {
-    target_uri = `${BASE_URI}/scripts/${script.id}`;
+  if (script_with_version.script.id) {
+    target_uri = `${BASE_URI}/scripts/${script_with_version.script.id}`;
   }
 
   const response = await fetch(target_uri, {
-    method: script.id ? "PUT" : "POST",
+    method: script_with_version.script.id ? "PUT" : "POST",
     headers: {
       "Content-Type": "application/json",
     },

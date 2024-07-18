@@ -15,7 +15,7 @@ import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
 import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
 import { useParams } from "react-router-dom";
-import { Script } from "../../types/qronos";
+import { ScriptWithVersion } from "../../types/qronos";
 import { fetchScript, saveOrUpdateScript } from "../services/Client";
 
 self.MonacoEnvironment = {
@@ -54,7 +54,7 @@ loader.init().then((monaco) => {
 // END: Needed in Vite environments
 
 const EditScript = () => {
-  const [editorValue, setEditorValue] = useState<string>("");
+  //const [editorValue, setEditorValue] = useState<string>("");
 
   const monacoRef = useRef(null);
   const editorRef = useRef<any>(null);
@@ -72,7 +72,7 @@ const EditScript = () => {
   // This is a callback function that is called when the editor content changes.
   const handleEditorChange = (value: any) => {
     formData.script_version.code_body = value;
-    setEditorValue(value);
+    //setEditorValue(value);
     setIsDirtyForm(true);
   };
 
@@ -97,12 +97,14 @@ const EditScript = () => {
     formatOnPaste: true,
   };
 
-  const [formData, setFormData] = useState<Script>({
-    id: undefined,
-    script_name: generateSlug(3, { format: "kebab" }),
-    script_type: "RUNNABLE",
-    created_at: undefined,
-    updated_at: undefined,
+  const [formData, setFormData] = useState<ScriptWithVersion>({
+    script: {
+      id: undefined,
+      script_name: generateSlug(3, { format: "kebab" }),
+      script_type: "RUNNABLE",
+      created_at: undefined,
+      updated_at: undefined,
+    },
     script_version: {
       id: undefined,
       code_body:
@@ -110,6 +112,20 @@ const EditScript = () => {
       created_at: undefined,
     },
   });
+
+  // id: undefined,
+  // script_name: generateSlug(3, { format: "kebab" }),
+  // script_type: "RUNNABLE",
+  // created_at: undefined,
+  // updated_at: undefined
+  // },
+  // script_version: {
+  //   id: undefined,
+  //   code_body:
+  //     "// Welcome to Qronos script editor!\n\nfunction hello(foo: string) {\n\tconsole.log('Hello, ' + foo);\n}\n\nhello('world');\n",
+  //   created_at: undefined,
+  // },
+  //});
 
   // initialize alert state
   const [alertVisible, setAlertVisible] = useState(false);
@@ -133,7 +149,7 @@ const EditScript = () => {
       });
     }
 
-    if (formData.id) {
+    if (formData.script.id) {
       setPageTitle("Edit Script");
       document.title = "Qronos | Edit Script";
     } else {
@@ -178,7 +194,11 @@ const EditScript = () => {
       saveOrUpdateScript(formData).then(async (response) => {
         if (response.ok) {
           const responseData = await response.json();
-          setFormData({ ...formData, id: responseData.id });
+          setFormData({
+            ...formData,
+            script: responseData.script,
+            script_version: responseData.script_version,
+          });
           displaySuccessAlert("Script Updated Successfully!");
         } else {
           displayErrorAlert("Script Save Error!" + response.statusText);
@@ -203,7 +223,7 @@ const EditScript = () => {
                 className="input input-bordered w-full max-w-xs"
                 name="script_name"
                 id="script_name"
-                value={formData.script_name}
+                value={formData.script.script_name}
                 onChange={handleChange}
                 required
               ></input>
@@ -214,7 +234,7 @@ const EditScript = () => {
                   className="select select-bordered w-full max-w-xs"
                   id="script_type"
                   name="script_type"
-                  value={formData.script_type}
+                  value={formData.script.script_type}
                   onChange={handleChange}
                   required
                 >
@@ -292,6 +312,7 @@ const EditScript = () => {
                 loading={<div>Reticulating Splines...</div>}
                 defaultLanguage="typescript"
                 defaultValue={formData.script_version?.code_body}
+                value={formData.script_version?.code_body}
                 name="code_body"
                 id="code_body"
                 onChange={(value: any) => {

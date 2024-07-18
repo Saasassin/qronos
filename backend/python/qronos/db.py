@@ -17,14 +17,14 @@ class ScriptType(str, enum.Enum):
     API = "API"
     RUNNABLE = "RUNNABLE"
 
-
+  
 class Script(SQLModel, table=True, extend_existing=True):
     __tablename__ = "script"
     __table_args__ = {"extend_existing": True}
     id: UUID = Field(default=None, primary_key=True)
     script_name: str = Field(unique=True, nullable=False)
     script_type: ScriptType = Field(sa_column=Column(Enum(ScriptType), nullable=False))
-#    current_version_id: UUID = Field(default=None, foreign_key="script_version.id", nullable=False)
+    current_version_id: UUID = Field(default=None, foreign_key="script_version.id", nullable=False)
     updated_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
     created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
 
@@ -44,7 +44,7 @@ class ScriptVersion(SQLModel, table=True, extend_existing=True):
     __table_args__ = {"extend_existing": True}
     id: UUID = Field(default=None, primary_key=True)
     code_body: str
-    script_id: UUID = Field(default=None, foreign_key="script.id", nullable=False)
+    #script_id: UUID = Field(default=None, foreign_key="script.id", nullable=False)
     created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
 
 

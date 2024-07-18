@@ -47,16 +47,22 @@ export type ScriptVersions = ScriptVersion[];
 export const Script = t.type({
   id: t.union([t.string, t.undefined]),
   script_name: t.string,
-  script_version: ScriptVersion, // most recent code. DB should just have a code_id that FKs to the Code table.
+  //script_version: ScriptVersion, // most recent code. DB should just have a code_id that FKs to the Code table.
   script_type: t.string,
   created_at: t.union([t.string, t.undefined]),
   updated_at: t.union([t.string, t.undefined]),
 });
-
 export type Script = t.TypeOf<typeof Script>;
 
 export const Scripts = t.array(Script);
 export type Scripts = t.TypeOf<typeof Scripts>;
+
+export const ScriptWithVersion = t.type({
+  script: Script,
+  script_version: ScriptVersion,
+});
+
+export type ScriptWithVersion = t.TypeOf<typeof ScriptWithVersion>;
 
 export const Job = t.type({
   id: t.number,

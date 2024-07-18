@@ -9,29 +9,31 @@ from sqlmodel import Session, select
 router = APIRouter()
 
 
+class ScriptWithVersion(BaseModel):
+    """
+    A model that combines a Script and its current ScriptVersion.
+    """
+    script: Script
+    script_version: ScriptVersion
+   
+
 @router.get("/scripts", tags=["Script Methods"], response_model=list[Script])
 async def read_scripts(session: Session = Depends(get_session), skip: int = 0, limit: int = 25):
     statement = select(Script).offset(skip).limit(limit)
     results = session.exec(statement)
     return results.all()
 
-
-class ScriptWithVersion(BaseModel):
-    script: Script
-    script_version: ScriptVersion
-
-
 @router.get("/scripts/{script_id}", tags=["Script Methods"], response_model=ScriptWithVersion)
 async def read_script(script_id: str, session: Session = Depends(get_session)):
     """
     Fetches a script by its ID with the ScriptVersion.
     """
-    statement = select(Script, ScriptVersion).where(Script.id == script_id)
+    statement = select(Script, ScriptVersion).where(Script.id == script_id).join(ScriptVersion).where(ScriptVersion.id == Script.current_version_id)
     [script, script_version] = session.exec(statement).first()
     return ScriptWithVersion(script=script, script_version=script_version)
 
 
-@router.post("/scripts", tags=["Script Methods"], response_model=Script)
+@router.post("/scripts", tags=["Script Methods"], response_model=ScriptWithVersion)
 async def create_script(script: Script, script_version: ScriptVersion, session: Session = Depends(get_session)):
     """
     Creates a new script and a new version.
@@ -39,17 +41,18 @@ async def create_script(script: Script, script_version: ScriptVersion, session: 
     script.id = uuid.uuid4()
 
     script_version.id = uuid.uuid4()
-    # script.current_version_id = script_version.id
-    script_version.script_id = script.id
+    script.current_version_id = script_version.id
+    #script_version.script_id = script.id
 
     session.add(script)
     session.add(script_version)
     session.commit()
     session.refresh(script)
-    return script
+
+    return ScriptWithVersion(script=script, script_version=script_version)
 
 
-@router.put("/scripts/{script_id}", tags=["Script Methods"], response_model=Script | None)
+@router.put("/scripts/{script_id}", tags=["Script Methods"], response_model=ScriptWithVersion | None)
 async def update_script(
     script_id: str, script: Script, script_version: ScriptVersion, session: Session = Depends(get_session)
 ):
@@ -62,14 +65,15 @@ async def update_script(
         existing_script.script_type = script.script_type
 
         script_version.id = uuid.uuid4()
-        script_version.script_id = script_id
+        #script_version.script_id = script_id
         session.add(script_version)
         existing_script.current_version_id = script_version.id
 
         session.add(existing_script)
         session.commit()
         session.refresh(existing_script)
-        return existing_script
+
+        return ScriptWithVersion(script=existing_script, script_version=script_version)
     return None
 
 

@@ -8,19 +8,20 @@ router = APIRouter()
 
 
 @router.get("/scripts", tags=["Script Methods"], response_model=list[Script])
-async def read_scripts(session: Session = Depends(get_session), skip: int = 0, limit: int = 10):
+async def read_scripts(session: Session = Depends(get_session), skip: int = 0, limit: int = 25):
     statement = select(Script).offset(skip).limit(limit)
     results = session.exec(statement)
     return results.all()
 
 
-@router.get("/scripts/{script_id}", tags=["Script Methods"], response_model=Script | None)
+@router.get("/scripts/{script_id}", tags=["Script Methods"], response_model=Script  | None)
 async def read_script(script_id: str, session: Session = Depends(get_session)):
     """
-    Fetches a script by its ID.
+    Fetches a script by its ID with the ScriptVersion.
     """
-    return session.exec(select(Script).where(Script.id == script_id)).first()
-
+    statement = select(Script, ScriptVersion).where(Script.id == script_id)
+    result = session.exec(statement).first()
+    return result
 
 @router.post("/scripts", tags=["Script Methods"], response_model=Script)
 async def create_script(script: Script, script_version: ScriptVersion, session: Session = Depends(get_session)):
@@ -30,7 +31,7 @@ async def create_script(script: Script, script_version: ScriptVersion, session: 
     script.id = uuid.uuid4()
 
     script_version.id = uuid.uuid4()
-    script.current_version_id = script_version.id
+    #script.current_version_id = script_version.id
     script_version.script_id = script.id
     
     session.add(script)

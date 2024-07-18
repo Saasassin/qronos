@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import Header from "./components/layouts/header";
 import SideNav from "./components/layouts/sidenav";
 import BrowseScripts from "./components/pages/browse_scripts";
-import CreateScript from "./components/pages/create_scripts";
+import EditScript from "./components/pages/edit_script";
 import ViewHistory from "./components/pages/history";
 import Home from "./components/pages/home";
 import SystemSettings from "./components/pages/system_settings";
@@ -17,7 +17,8 @@ const App = () => {
         <Routes>
           <Route index element={<Home />} />
           <Route path="/" element={<Home />} />
-          <Route path="/create_script" element={<CreateScript />} />
+          <Route path="/edit_script/:id" element={<EditScript />} />
+          <Route path="/create_script" element={<EditScript />} />
           <Route path="/browse_scripts" element={<BrowseScripts />} />
           <Route path="/view_history" element={<ViewHistory />} />
           <Route path="/system_settings" element={<SystemSettings />} />

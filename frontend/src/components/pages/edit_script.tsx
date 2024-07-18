@@ -14,8 +14,9 @@ import cssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
 import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
 import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
+import { useParams } from "react-router-dom";
 import { Script } from "../../types/qronos";
-import { saveOrUpdateScript } from "../services/Client";
+import { fetchScript, saveOrUpdateScript } from "../services/Client";
 
 self.MonacoEnvironment = {
   getWorker(_, label) {
@@ -52,7 +53,7 @@ loader.init().then((monaco) => {
 });
 // END: Needed in Vite environments
 
-const CreateScript = () => {
+const EditScript = () => {
   const [editorValue, setEditorValue] = useState<string>("");
 
   const monacoRef = useRef(null);
@@ -118,9 +119,28 @@ const CreateScript = () => {
   // initialize save button dirty state
   const [isDirty, setIsDirtyForm] = useState(false);
 
+  // initialize page header state
+  const [pageTitle, setPageTitle] = useState("Create Script");
+
+  const { id } = useParams();
+
   useEffect(() => {
-    document.title = "Create Script | Qronos";
-  });
+    if (id) {
+      console.log("Editing Script ID: ", id);
+      fetchScript(id).then((data) => {
+        console.log("Fetched Script: ", data);
+        setFormData(data);
+      });
+    }
+
+    if (formData.id) {
+      setPageTitle("Edit Script");
+      document.title = "Qronos | Edit Script";
+    } else {
+      setPageTitle("Create Script");
+      document.title = "Qronos | Create Script";
+    }
+  }, [id]);
 
   const displaySuccessAlert = (message: string) => {
     setAlertType(AlertType.SUCCESS);
@@ -173,7 +193,7 @@ const CreateScript = () => {
   return (
     <>
       <div className="ml-64 mt-16 p-4">
-        <h1>Create Script</h1>
+        <h1>{pageTitle}</h1>
 
         <form className="mt-5">
           <div className="grid gap-4 sm:grid-cols-3 sm:gap-6">
@@ -201,39 +221,27 @@ const CreateScript = () => {
                   <option value="RUNNABLE">Runnable Script</option>
                   <option value="API">HTTP API</option>
                 </select>
-                <div className="dropdown dropdown-end">
-                  <div
-                    className="tooltip"
-                    data-tip="Click for Description of Script Types..."
+                <div
+                  tabIndex={0}
+                  role="button"
+                  className="btn btn-circle btn-ghost btn-xs ml-3 group"
+                >
+                  <IconContext.Provider
+                    value={{ className: "react-icon-button" }}
                   >
-                    <div
-                      tabIndex={0}
-                      role="button"
-                      className="btn btn-circle btn-ghost btn-xs ml-3"
-                    >
-                      <IconContext.Provider
-                        value={{ className: "react-icon-button" }}
-                      >
-                        <IoInformationCircleOutline />
-                      </IconContext.Provider>
-                    </div>
-                  </div>
-                  <div
-                    tabIndex={0}
-                    className="card compact dropdown-content bg-base-100 rounded-box z-[1] w-64 shadow"
-                  >
-                    <div tabIndex={0} className="card-body">
-                      <h3 className="card-title">Script Types</h3>
-                      <div className="px-3">
-                        <h5>Runnable Script</h5>
-                        <p>
+                    <IoInformationCircleOutline />
+                  </IconContext.Provider>
+                  <div className="invisible group-hover:visible z-50">
+                    <div className="card bg-neutral text-neutral-content w-96">
+                      <div className="card-body">
+                        <h5 className="mb-0">Runnable Script</h5>
+                        <p className="leading-normal">
                           A script that is triggered on a cron-like schedule or
                           executed on-demand.
-                        </p>
-                        <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700" />
-
-                        <h5>HTTP API</h5>
-                        <p>
+                        </p>{" "}
+                        <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700" />{" "}
+                        <h5 className="mb-0">HTTP API</h5>
+                        <p className="leading-normal">
                           A Script that will listen and respond to HTTP
                           requests.
                         </p>
@@ -283,7 +291,7 @@ const CreateScript = () => {
                 theme="vs-dark"
                 loading={<div>Reticulating Splines...</div>}
                 defaultLanguage="typescript"
-                defaultValue={formData.script_version.code_body}
+                defaultValue={formData.script_version?.code_body}
                 name="code_body"
                 id="code_body"
                 onChange={(value: any) => {
@@ -339,4 +347,4 @@ const CreateScript = () => {
   );
 };
 
-export default CreateScript;
+export default EditScript;

@@ -26,7 +26,7 @@ const SideNav = () => {
             </Link>
           </li>
           <li>
-            <Link to="/">
+            <Link to="/browse_scripts">
               <IconContext.Provider value={{ className: "react-icon-button" }}>
                 <IoList />
               </IconContext.Provider>

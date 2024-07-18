@@ -1,6 +1,6 @@
 import { Script } from "../../types/qronos";
 
-const BASE_URI = import.meta.env.QRONOS_API_URL || "http://?????????????";
+const BASE_URI = import.meta.env.QRONOS_API_URL || "http://?????????????"; // TODO: Fill in the correct URL for default
 
 export const saveOrUpdateScript = async (script: Script) => {
   const post_body = {
@@ -30,7 +30,16 @@ export const saveOrUpdateScript = async (script: Script) => {
   return response;
 };
 
-export const fetchScripts = async () => {
-  const response = await fetch(`${BASE_URI}/scripts`);
-  return response;
+export const fetchScripts = async (limit: number = 25, skip: number = 0) => {
+  const response = await fetch(
+    `${BASE_URI}/scripts?limit=${limit}&skip=${skip}`
+  );
+  const data = await response.json();
+  return data;
+};
+
+export const fetchScript = async (id: string) => {
+  const response = await fetch(`${BASE_URI}/scripts/${id}`);
+  const data = await response.json();
+  return data;
 };

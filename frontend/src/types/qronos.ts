@@ -37,7 +37,7 @@ export type SystemStatus = t.TypeOf<typeof SystemStatus>;
  */
 export const ScriptVersion = t.type({
   id: t.union([t.string, t.undefined]),
-  code_body: t.string,
+  code_body: t.union([t.string, t.undefined]),
   created_at: t.union([t.string, t.undefined]),
 });
 
@@ -55,7 +55,8 @@ export const Script = t.type({
 
 export type Script = t.TypeOf<typeof Script>;
 
-export type Scripts = Script[];
+export const Scripts = t.array(Script);
+export type Scripts = t.TypeOf<typeof Scripts>;
 
 export const Job = t.type({
   id: t.number,

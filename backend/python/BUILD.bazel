@@ -91,3 +91,8 @@ py_venv(
     imports = ["."],
     deps = all_requirements,
 )
+
+alias(
+    name = "python",
+    actual = ":main",
+)

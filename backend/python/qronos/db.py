@@ -22,7 +22,7 @@ class Script(SQLModel, table=True, extend_existing=True):
     __tablename__ = "script"
     __table_args__ = {"extend_existing": True}
     id: UUID = Field(default=None, primary_key=True)
-    script_name: str = Field(sa_column=Column(unique=True, nullable=False))
+    script_name: str = Field(unique=True, nullable=False)
     script_type: ScriptType = Field(sa_column=Column(Enum(ScriptType), nullable=False))
 #    current_version_id: UUID = Field(default=None, foreign_key="script_version.id", nullable=False)
     updated_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
@@ -62,7 +62,7 @@ class RunHistory(SQLModel, table=True, extend_existing=True):
 
 
 class UserBase(SQLModel):
-    email: str = Field(sa_column=Column(unique=True, nullable=False))
+    email: str = Field(unique=True, nullable=False)
     password: str = Field(nullable=False)
 
 

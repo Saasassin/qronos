@@ -45,3 +45,10 @@ export const fetchScript = async (id: string) => {
   const data = await response.json();
   return data;
 };
+
+export const deleteScript = async (id: string) => {
+  const response = await fetch(`${BASE_URI}/scripts/${id}`, {
+    method: "DELETE",
+  });
+  return response;
+};

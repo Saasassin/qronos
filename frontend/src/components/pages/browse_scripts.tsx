@@ -4,12 +4,23 @@ import { IoCreateOutline } from "react-icons/io5";
 import { MdHttp } from "react-icons/md";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
-import { Scripts } from "../../types/qronos";
-import { fetchScripts } from "../services/Client";
+import { Script, Scripts } from "../../types/qronos";
+import { formatDateAndTime } from "../dateutils";
+import { deleteScript, fetchScripts } from "../services/Client";
 
-const ScriptTable = ({ scripts }: { scripts: Scripts }) => {
+const ScriptTable = () => {
+  // = ({ scripts }: { scripts: Scripts }) => {
+
+  useEffect(() => {
+    fetchScripts().then((data) => {
+      setScripts(data);
+    });
+  }, []);
+
+  const [scripts, setScripts] = useState<Scripts>([]);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [sortField, setSortField] = useState<keyof Scripts[0]>("created_at");
+  const [selectedForDelete, setSelectedForDelete] = useState<Script>();
 
   const handleSort = (field: keyof Scripts[0]) => {
     setSortField(field);
@@ -31,7 +42,31 @@ const ScriptTable = ({ scripts }: { scripts: Scripts }) => {
         : 0;
     }
   });
-  scripts = sortedScripts;
+
+  const showDeleteModal = (script_id: string) => {
+    const deleteModal = document.getElementById(
+      "delete_modal"
+    ) as HTMLDialogElement;
+    deleteModal?.showModal();
+
+    // find the script in the list 'scripts' and set it as selected for delete
+    const script = scripts.find((script) => script.id === script_id);
+    if (script) {
+      setSelectedForDelete(script);
+    }
+  };
+
+  const confirmDeleteScript = (script_id: string) => {
+    const deleteModal = document.getElementById(
+      "delete_modal"
+    ) as HTMLDialogElement;
+    deleteModal?.close();
+
+    console.log("Deleting script with id: ", script_id);
+    deleteScript(script_id);
+
+    window.location.reload();
+  };
 
   const getScriptTypeIcon = (scriptType: string) => {
     if (scriptType === "RUNNABLE") {
@@ -52,12 +87,6 @@ const ScriptTable = ({ scripts }: { scripts: Scripts }) => {
       );
     }
   };
-
-  const formatDateAndTime = (date: any) => {
-    const dateObj = new Date(date);
-    return dateObj.toLocaleDateString() + " " + dateObj.toLocaleTimeString();
-  };
-
   return (
     <div className="overflow-x-auto mt-5">
       <table className="table table-zebra  border border-dashed border-neutral border-collapse">
@@ -107,7 +136,12 @@ const ScriptTable = ({ scripts }: { scripts: Scripts }) => {
                     </button>{" "}
                   </div>
                   <div className="tooltip" data-tip="Delete">
-                    <button className="btn btn-sm btn-neutral join-item">
+                    <button
+                      className="btn btn-sm btn-neutral join-item"
+                      onClick={() =>
+                        showDeleteModal(script.id ? script.id : "")
+                      }
+                    >
                       <RiDeleteBinLine />
                     </button>{" "}
                   </div>
@@ -130,25 +164,48 @@ const ScriptTable = ({ scripts }: { scripts: Scripts }) => {
         <button className="join-item btn ">3</button>
         <button className="join-item btn ">4</button>
       </div>
+
+      {/* BEGIN: DELETE MODAL */}
+      <dialog id="delete_modal" className="modal">
+        <div className="modal-box">
+          <form method="dialog">
+            {/* a button in here will close the form */}
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+              ✕
+            </button>
+          </form>
+          <h3 className="font-bold text-lg">Hello!</h3>
+          <p className="py-4">
+            Are you sure you want to delete {selectedForDelete?.script_name}?
+          </p>
+          <div className="modal-action">
+            <button
+              className="btn btn-error"
+              onClick={() =>
+                confirmDeleteScript(
+                  selectedForDelete?.id ? selectedForDelete.id : ""
+                )
+              }
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </dialog>
+      {/* END: DELETE MODAL */}
     </div>
   );
 };
 
 const BrowseScripts = () => {
-  const [scripts, setScripts] = useState<Scripts>([]);
-  useEffect(() => {
-    fetchScripts().then((data) => {
-      setScripts(data);
-    });
-  }, []);
-
   return (
     <>
       <div className="ml-64 mt-16 p-4">
         <h1>Browse Scripts</h1>
 
         <div className="overflow-x-auto">
-          <ScriptTable scripts={scripts} />
+          <ScriptTable />
+          {/* scripts={scripts} /> */}
         </div>
       </div>
     </>

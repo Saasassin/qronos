@@ -28,6 +28,13 @@ class Script(SQLModel, table=True, extend_existing=True):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
     created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
 
+class ScriptVersion(SQLModel, table=True, extend_existing=True):
+    __tablename__ = "script_version"
+    __table_args__ = {"extend_existing": True}
+    id: UUID = Field(default=None, primary_key=True)
+    code_body: str
+    script_id: UUID = Field(default=None, nullable=False)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
 
 class ScriptSchedule(SQLModel, table=True, extend_existing=True):
     __tablename__ = "script_schedule"
@@ -37,16 +44,6 @@ class ScriptSchedule(SQLModel, table=True, extend_existing=True):
     cron_expression: str
     updated_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
     created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
-
-
-class ScriptVersion(SQLModel, table=True, extend_existing=True):
-    __tablename__ = "script_version"
-    __table_args__ = {"extend_existing": True}
-    id: UUID = Field(default=None, primary_key=True)
-    code_body: str
-    #script_id: UUID = Field(default=None, foreign_key="script.id", nullable=False)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
-
 
 class RunHistory(SQLModel, table=True, extend_existing=True):
     __tablename__ = "run_history"

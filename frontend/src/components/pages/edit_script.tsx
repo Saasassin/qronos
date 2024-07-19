@@ -113,20 +113,6 @@ const EditScript = () => {
     },
   });
 
-  // id: undefined,
-  // script_name: generateSlug(3, { format: "kebab" }),
-  // script_type: "RUNNABLE",
-  // created_at: undefined,
-  // updated_at: undefined
-  // },
-  // script_version: {
-  //   id: undefined,
-  //   code_body:
-  //     "// Welcome to Qronos script editor!\n\nfunction hello(foo: string) {\n\tconsole.log('Hello, ' + foo);\n}\n\nhello('world');\n",
-  //   created_at: undefined,
-  // },
-  //});
-
   // initialize alert state
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");

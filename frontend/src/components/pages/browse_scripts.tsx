@@ -2,6 +2,8 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
+  SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 import { useEffect, useReducer, useState } from "react";
@@ -67,31 +69,18 @@ const BrowseTable = ({ data }: { data: any }) => {
     }),
   ];
 
-  type ColumnSort = {
-    id: string;
-    desc: boolean;
-  };
-  type SortingState = ColumnSort[];
-
   const [selectedForDelete, setSelectedForDelete] = useState<Script>();
   const [sorting, setSorting] = useState<SortingState>([]); // can set initial sorting state here
   const tableInstance = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    //getSortedRowModel: getSortedRowModel(), //client-side sorting
+    getSortedRowModel: getSortedRowModel(), //client-side sorting
     onSortingChange: setSorting,
-    state: {
-      sorting: [
-        {
-          id: "created_at",
-          desc: true,
-        },
-      ] as SortingState,
-    },
+    state: { sorting },
   });
 
-  console.log(tableInstance.getState().sorting);
+  console.log("sorting", tableInstance.getState().sorting);
 
   const getScriptTypeIcon = (scriptType: string) => {
     if (scriptType === "RUNNABLE") {
@@ -148,13 +137,26 @@ const BrowseTable = ({ data }: { data: any }) => {
             {tableInstance.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <th key={header.id} className="text-lg">
+                  <th
+                    key={header.id}
+                    className={
+                      "text-lg " +
+                      (header.column.getCanSort()
+                        ? "cursor-pointer select-none"
+                        : "")
+                    }
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
                           header.getContext()
                         )}
+                    {{
+                      asc: " 🔼",
+                      desc: " 🔽",
+                    }[header.column.getIsSorted() as string] ?? null}
                   </th>
                 ))}
               </tr>

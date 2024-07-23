@@ -6,10 +6,16 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
+
 import { useEffect, useReducer, useState } from "react";
+import { FaSortUp } from "react-icons/fa";
+import { FaSortDown } from "react-icons/fa6";
+
+import { LuPlug } from "react-icons/lu";
+
+import { IconContext } from "react-icons";
 import { FaRegChartBar, FaRegHourglass, FaRunning } from "react-icons/fa";
 import { IoCreateOutline } from "react-icons/io5";
-import { MdHttp } from "react-icons/md";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
 import { Script } from "../../types/qronos";
@@ -95,7 +101,7 @@ const BrowseTable = ({ data }: { data: any }) => {
       return (
         <div className="tooltip" data-tip="HTTP API">
           <div className="badge badge-neutral">
-            <MdHttp />
+            <LuPlug />
           </div>
         </div>
       );
@@ -154,8 +160,26 @@ const BrowseTable = ({ data }: { data: any }) => {
                           header.getContext()
                         )}
                     {{
-                      asc: " 🔼",
-                      desc: " 🔽",
+                      asc: (
+                        <IconContext.Provider
+                          value={{
+                            className:
+                              "react-icon-button inline-block pl-0 ml-0",
+                          }}
+                        >
+                          <FaSortUp />
+                        </IconContext.Provider>
+                      ),
+                      desc: (
+                        <IconContext.Provider
+                          value={{
+                            className:
+                              "react-icon-button inline-block pl-0 ml-0",
+                          }}
+                        >
+                          <FaSortDown />
+                        </IconContext.Provider>
+                      ),
                     }[header.column.getIsSorted() as string] ?? null}
                   </th>
                 ))}

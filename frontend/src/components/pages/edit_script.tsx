@@ -1,5 +1,6 @@
 import { generateSlug } from "random-word-slugs";
 import { IconContext } from "react-icons";
+
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { VscOpenPreview, VscSave } from "react-icons/vsc";
 import AlertComponent, { AlertType } from "../core/alert";
@@ -165,7 +166,14 @@ const EditScript = () => {
   // This handles changes in the form fields, but NOT the editor.
   const handleChange = (event: { target: { name: any; value: any } }) => {
     const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({
+      ...formData,
+      script: {
+        ...formData.script,
+        [name]: value,
+      },
+    });
+
     setIsDirtyForm(true);
   };
 

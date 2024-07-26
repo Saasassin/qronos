@@ -2,33 +2,39 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
-  getSortedRowModel,
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-
-import { useEffect, useReducer, useState } from "react";
-import { FaSortUp } from "react-icons/fa";
-import { FaSortDown } from "react-icons/fa6";
-
-import { LuPlug } from "react-icons/lu";
-
+import { useEffect, useState } from "react";
 import { IconContext } from "react-icons";
-import { FaRegChartBar, FaRegHourglass, FaRunning } from "react-icons/fa";
+import {
+  FaRegChartBar,
+  FaRegHourglass,
+  FaRunning,
+  FaSortUp,
+} from "react-icons/fa";
+import { FaSortDown } from "react-icons/fa6";
 import { IoCreateOutline } from "react-icons/io5";
+import { LuPlug } from "react-icons/lu";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
 import { Script } from "../../types/qronos";
 import { formatDateAndTime } from "../dateutils";
 import { deleteScript, fetchScripts } from "../services/Client";
 
-const BrowseTable = ({ data }: { data: any }) => {
-  const rerender = useReducer(() => ({}), {})[1];
+const BrowseTable = () => {
+  const [data, setData] = useState([]);
+  const [selectedForDelete, setSelectedForDelete] = useState<Script>();
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "created_at", desc: true },
+  ]);
 
   const columnHelper = createColumnHelper<Script>();
   const columns = [
     columnHelper.accessor("id", {
       header: "",
+      enableSorting: false,
+
       cell: (row) => (
         <>
           <div className="join">
@@ -75,18 +81,27 @@ const BrowseTable = ({ data }: { data: any }) => {
     }),
   ];
 
-  const [selectedForDelete, setSelectedForDelete] = useState<Script>();
-  const [sorting, setSorting] = useState<SortingState>([]); // can set initial sorting state here
   const tableInstance = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(), //client-side sorting
+    //getSortedRowModel: getSortedRowModel(), //client-side sorting
     onSortingChange: setSorting,
+    manualSorting: true,
+    enableSortingRemoval: false, // disable the ability to remove sorting on columns
     state: { sorting },
   });
 
-  console.log("sorting", tableInstance.getState().sorting);
+  useEffect(() => {
+    console.log("sortby", tableInstance.getState().sorting);
+
+    const sortState = tableInstance.getState().sorting;
+    const sortDirection = sortState[0].desc ? "DESC" : "ASC"; // convert to server-side sort string
+
+    fetchScripts(25, 0, sortState[0].id, sortDirection).then((data) => {
+      setData(data);
+    });
+  }, [sorting]);
 
   const getScriptTypeIcon = (scriptType: string) => {
     if (scriptType === "RUNNABLE") {
@@ -239,13 +254,13 @@ const BrowseTable = ({ data }: { data: any }) => {
 };
 
 const BrowseScripts = () => {
-  const [data, setData] = useState([]);
+  // const [data, setData] = useState([]);
 
-  useEffect(() => {
-    fetchScripts().then((data) => {
-      setData(data);
-    });
-  }, []);
+  // useEffect(() => {
+  //   fetchScripts().then((data) => {
+  //     setData(data);
+  //   });
+  // }, []);
 
   return (
     <>
@@ -253,8 +268,8 @@ const BrowseScripts = () => {
         <h1>Browse Scripts</h1>
 
         <div className="overflow-x-auto">
-          {/* <BrowseTable columns={columns} data={data} /> */}
-          <BrowseTable data={data} />
+          <BrowseTable />
+          {/* <BrowseTable data={data} /> */}
         </div>
       </div>
     </>

@@ -32,9 +32,14 @@ export const saveOrUpdateScript = async (
   return response;
 };
 
-export const fetchScripts = async (limit: number = 25, skip: number = 0) => {
+export const fetchScripts = async (
+  limit: number = 25,
+  skip: number = 0,
+  sortby: string,
+  sortDirection: string = "DESC"
+) => {
   const response = await fetch(
-    `${BASE_URI}/scripts?limit=${limit}&skip=${skip}`
+    `${BASE_URI}/scripts?limit=${limit}&skip=${skip}&sort=${sortby}&order=${sortDirection}`
   );
   const data = await response.json();
   return data;

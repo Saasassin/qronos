@@ -1,5 +1,6 @@
 import uuid
 from uuid import UUID
+import sqlalchemy as sa
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
@@ -16,11 +17,12 @@ class ScriptWithVersion(BaseModel):
     script_version: ScriptVersion
    
 @router.get("/scripts", tags=["Script Methods"], response_model=list[Script])
-async def read_scripts(session: Session = Depends(get_session), skip: int = 0, limit: int = 25):
-    statement = select(Script).offset(skip).limit(limit)
-    results = session.exec(statement)
-    return results.all()
+async def read_scripts(session: Session = Depends(get_session), skip: int = 0, limit: int = 25, sort: str = "id", order: str = "ASC"):
 
+    statement = select(Script).offset(skip).limit(limit).order_by(sa.text(sort + " " + order))
+    results = session.exec(statement)  
+    return results.all()
+ 
 @router.get("/scripts/{script_id}", tags=["Script Methods"], response_model=ScriptWithVersion)
 async def read_script(script_id: str, session: Session = Depends(get_session)):
     """

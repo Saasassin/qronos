@@ -1,6 +1,7 @@
 import uuid
 from uuid import UUID
 import sqlalchemy as sa
+from sqlalchemy import func
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
@@ -20,9 +21,19 @@ class ScriptWithVersion(BaseModel):
 async def read_scripts(session: Session = Depends(get_session), skip: int = 0, limit: int = 25, sort: str = "id", order: str = "ASC"):
 
     statement = select(Script).offset(skip).limit(limit).order_by(sa.text(sort + " " + order))
+#    statement = select(Script).offset(skip).limit(25).order_by(sa.text(sort + " " + order))
+
     results = session.exec(statement)  
     return results.all()
- 
+
+@router.get("/scripts/count", tags=["Script Methods"], response_model=int)
+async def read_script_count(session: Session = Depends(get_session)):
+    """
+    Fetches the total number of scripts.
+    """
+    statement = select(func.count(Script.id))
+    return session.scalar(statement)
+
 @router.get("/scripts/{script_id}", tags=["Script Methods"], response_model=ScriptWithVersion)
 async def read_script(script_id: str, session: Session = Depends(get_session)):
     """

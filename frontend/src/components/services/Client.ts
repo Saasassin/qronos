@@ -45,6 +45,12 @@ export const fetchScripts = async (
   return data;
 };
 
+export const fetchScriptsCount = async () => {
+  const response = await fetch(`${BASE_URI}/scripts/count`);
+  const data = await response.json();
+  return data;
+};
+
 export const fetchScript = async (id: string) => {
   const response = await fetch(`${BASE_URI}/scripts/${id}`);
   const data = await response.json();

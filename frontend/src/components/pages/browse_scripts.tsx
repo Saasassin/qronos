@@ -2,6 +2,7 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getPaginationRowModel,
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
@@ -14,21 +15,31 @@ import {
   FaSortUp,
 } from "react-icons/fa";
 import { FaSortDown } from "react-icons/fa6";
+import { GrCaretNext, GrCaretPrevious } from "react-icons/gr";
 import { IoCreateOutline } from "react-icons/io5";
 import { LuPlug } from "react-icons/lu";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
 import { Script } from "../../types/qronos";
 import { formatDateAndTime } from "../dateutils";
-import { deleteScript, fetchScripts } from "../services/Client";
+
+import {
+  deleteScript,
+  fetchScripts,
+  fetchScriptsCount,
+} from "../services/Client";
 
 const BrowseTable = () => {
   const [data, setData] = useState([]);
+  const [count, setCount] = useState(0);
   const [selectedForDelete, setSelectedForDelete] = useState<Script>();
   const [sorting, setSorting] = useState<SortingState>([
     { id: "created_at", desc: true },
   ]);
-
+  const [pagination, setPagination] = useState({
+    pageIndex: 0, //initial page index
+    pageSize: 5, //default page size
+  });
   const columnHelper = createColumnHelper<Script>();
   const columns = [
     columnHelper.accessor("id", {
@@ -85,11 +96,14 @@ const BrowseTable = () => {
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    //getSortedRowModel: getSortedRowModel(), //client-side sorting
     onSortingChange: setSorting,
     manualSorting: true,
     enableSortingRemoval: false, // disable the ability to remove sorting on columns
-    state: { sorting },
+    state: { sorting, pagination },
+    getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: true,
+    rowCount: count,
+    onPaginationChange: setPagination, //update the pagination state when internal APIs mutate the pagination state
   });
 
   useEffect(() => {
@@ -98,10 +112,30 @@ const BrowseTable = () => {
     const sortState = tableInstance.getState().sorting;
     const sortDirection = sortState[0].desc ? "DESC" : "ASC"; // convert to server-side sort string
 
-    fetchScripts(25, 0, sortState[0].id, sortDirection).then((data) => {
-      setData(data);
+    fetchScriptsCount().then((count) => {
+      setCount(count);
+      fetchScripts(
+        tableInstance.getState().pagination.pageSize,
+        tableInstance.getState().pagination.pageSize *
+          tableInstance.getState().pagination.pageIndex,
+        sortState[0].id,
+        sortDirection
+      ).then((data) => {
+        setData(data);
+      });
     });
-  }, [sorting]);
+  }, [sorting, pagination]);
+
+  //   fetchScripts(
+  //     tableInstance.getState().pagination.pageSize,
+  //     tableInstance.getState().pagination.pageSize *
+  //       tableInstance.getState().pagination.pageIndex,
+  //     sortState[0].id,
+  //     sortDirection
+  //   ).then((data) => {
+  //     setData(data);
+  //   });
+  // }, [sorting, pagination]);
 
   const getScriptTypeIcon = (scriptType: string) => {
     if (scriptType === "RUNNABLE") {
@@ -214,10 +248,20 @@ const BrowseTable = () => {
           </tbody>
         </table>
         <div className="join justify-center w-full mt-4">
-          <button className="join-item btn btn-active">1</button>
-          <button className="join-item btn ">2</button>
-          <button className="join-item btn ">3</button>
-          <button className="join-item btn ">4</button>
+          <button
+            className="join-item btn"
+            onClick={() => tableInstance.previousPage()}
+            disabled={!tableInstance.getCanPreviousPage()}
+          >
+            <GrCaretPrevious />
+          </button>
+          <button
+            className="join-item btn"
+            onClick={() => tableInstance.nextPage()}
+            disabled={!tableInstance.getCanNextPage()}
+          >
+            <GrCaretNext />
+          </button>
         </div>
       </div>
       {/* BEGIN: DELETE MODAL */}
@@ -254,14 +298,6 @@ const BrowseTable = () => {
 };
 
 const BrowseScripts = () => {
-  // const [data, setData] = useState([]);
-
-  // useEffect(() => {
-  //   fetchScripts().then((data) => {
-  //     setData(data);
-  //   });
-  // }, []);
-
   return (
     <>
       <div className="ml-64 mt-16 p-4">
@@ -269,7 +305,6 @@ const BrowseScripts = () => {
 
         <div className="overflow-x-auto">
           <BrowseTable />
-          {/* <BrowseTable data={data} /> */}
         </div>
       </div>
     </>

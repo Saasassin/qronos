@@ -19,10 +19,11 @@ import { GrCaretNext, GrCaretPrevious } from "react-icons/gr";
 import { IoCreateOutline } from "react-icons/io5";
 import { LuPlug } from "react-icons/lu";
 import { RiDeleteBinLine } from "react-icons/ri";
+import "react-js-cron/dist/styles.css";
 import { Link } from "react-router-dom";
 import { Script } from "../../types/qronos";
+import { CronDiv } from "../core/cron";
 import { formatDateAndTime } from "../dateutils";
-
 import {
   deleteScript,
   fetchScripts,
@@ -62,7 +63,10 @@ const BrowseTable = () => {
               </button>{" "}
             </div>
             <div className="tooltip" data-tip="Schedule">
-              <button className="btn btn-sm btn-neutral join-item">
+              <button
+                className="btn btn-sm btn-neutral join-item"
+                onClick={() => showCronModal(row.getValue())}
+              >
                 <FaRegHourglass />
               </button>{" "}
             </div>
@@ -107,8 +111,6 @@ const BrowseTable = () => {
   });
 
   useEffect(() => {
-    console.log("sortby", tableInstance.getState().sorting);
-
     const sortState = tableInstance.getState().sorting;
     const sortDirection = sortState[0].desc ? "DESC" : "ASC"; // convert to server-side sort string
 
@@ -125,17 +127,6 @@ const BrowseTable = () => {
       });
     });
   }, [sorting, pagination]);
-
-  //   fetchScripts(
-  //     tableInstance.getState().pagination.pageSize,
-  //     tableInstance.getState().pagination.pageSize *
-  //       tableInstance.getState().pagination.pageIndex,
-  //     sortState[0].id,
-  //     sortDirection
-  //   ).then((data) => {
-  //     setData(data);
-  //   });
-  // }, [sorting, pagination]);
 
   const getScriptTypeIcon = (scriptType: string) => {
     if (scriptType === "RUNNABLE") {
@@ -155,6 +146,13 @@ const BrowseTable = () => {
         </div>
       );
     }
+  };
+
+  const showCronModal = (script_id: string = "") => {
+    const cronModal = document.getElementById(
+      "cron_modal"
+    ) as HTMLDialogElement;
+    cronModal?.showModal();
   };
 
   const showDeleteModal = (script_id: string = "") => {
@@ -247,6 +245,12 @@ const BrowseTable = () => {
             ))}
           </tbody>
         </table>
+        <p className="float-right text-xs mr-2 mt-3 text-neutral-500 ">
+          Page {tableInstance.getState().pagination.pageIndex + 1} of{" "}
+          {tableInstance.getPageCount()}. Showing{" "}
+          {tableInstance.getState().pagination.pageSize} of{" "}
+          {tableInstance.getRowCount()} scripts.
+        </p>
         <div className="join justify-center w-full mt-4">
           <button
             className="join-item btn"
@@ -293,6 +297,31 @@ const BrowseTable = () => {
         </div>
       </dialog>
       {/* END: DELETE MODAL */}
+
+      {/* BEGIN: CRON MODAL */}
+      <div className="drawer drawer-end">
+        <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
+        <div className="drawer-content">
+          {/* Page content here */}
+          <label
+            htmlFor="my-drawer-4"
+            className="drawer-button btn btn-primary"
+          >
+            Open drawer
+          </label>
+        </div>
+        <div className="drawer-side">
+          <label
+            htmlFor="my-drawer-4"
+            aria-label="close sidebar"
+            className="drawer-overlay"
+          ></label>
+          <div className="menu bg-base-200 text-base-content min-h-full w-1/2 p-4 mt-16">
+            <CronDiv />
+          </div>
+        </div>
+      </div>
+      {/* END: CRON MODAL */}
     </>
   );
 };

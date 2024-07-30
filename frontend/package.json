@@ -12,12 +12,14 @@
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",
     "@tanstack/react-table": "^8.19.3",
+    "antd": "^5.19.4",
     "io-ts": "^2.2.21",
     "monaco-editor": "^0.50.0",
     "random-word-slugs": "^0.1.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.2.1",
+    "react-js-cron": "^5.0.1",
     "react-router-dom": "^6.23.1"
   },
   "devDependencies": {

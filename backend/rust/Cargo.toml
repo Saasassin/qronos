@@ -8,13 +8,17 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.86"
 # wgpu-core = "0.20"
+clap = "4.4.17"
 deno_ast = { version = "0.39.2", features = ["transpiling"] }
 deno_core = "0.293.0"
+deno_npm = "0.21.4"
+deno_terminal = "0.1.1"
 # deno_runtime = "0.167.0"
-deno_runtime = { git = "https://github.com/Saasassin/deno.git", rev = "3338373b05d5935168758c029d069c77734eca13"}
-deno = { git = "https://github.com/Saasassin/deno.git", rev = "3338373b05d5935168758c029d069c77734eca13"}
+deno_runtime = { git = "https://github.com/Saasassin/deno.git", rev = "66f1976f1581d6c7b5e86d671a82604461aee3e3", package = "deno_runtime" }
+deno = { git = "https://github.com/Saasassin/deno.git", rev = "66f1976f1581d6c7b5e86d671a82604461aee3e3", package = "deno" }
 # deno_ast = { git = "https://github.com/Saasassin/deno.git", branch = "v1.45.0-patches" }
 # deno_core = { git = "https://github.com/Saasassin/deno.git", branch = "v1.45.0-patches" }
 # deno_runtime = { git = "https://github.com/Saasassin/deno.git", branch = "v1.45.0-patches" }
 tokio = "1.38.0"
 v8 = "0.97.1"
+rocket = "0.5.1"

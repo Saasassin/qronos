@@ -8,9 +8,13 @@ rust_binary(
     data = glob(["src/*.js"]),
     deps = [
         "@crates//:anyhow",
+        "@crates//:clap",
+        "@crates//:deno",
         "@crates//:deno_ast",
         "@crates//:deno_core",
+        "@crates//:deno_npm",
         "@crates//:deno_runtime",
+        "@crates//:deno_terminal",
         "@crates//:tokio",
     ],
 )

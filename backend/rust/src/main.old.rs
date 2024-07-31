@@ -3,16 +3,8 @@
 #![allow(clippy::print_stdout)]
 #![allow(clippy::print_stderr)]
 
-#[macro_use]
-extern crate rocket;
-
-use args::EvalFlags;
 use deno::*;
 use deno_core::op2;
-use deno_runtime::deno_permissions::Permissions;
-use deno_runtime::deno_permissions::PermissionsContainer;
-use rocket::response::Responder;
-use tokio::task::JoinError;
 
 use crate::args::flags_from_vec;
 use crate::args::DenoSubcommand;
@@ -26,7 +18,6 @@ use crate::util::v8::init_v8_flags;
 use deno_runtime::WorkerExecutionMode;
 pub use deno_runtime::UNSTABLE_GRANULAR_FLAGS;
 
-use deno::file_fetcher::File;
 use deno_core::anyhow::Context;
 use deno_core::error::AnyError;
 use deno_core::error::JsError;
@@ -43,25 +34,27 @@ use std::path::PathBuf;
 
 trait SubcommandOutput {
     fn output(self) -> Result<i32, AnyError>;
-}
-
-impl SubcommandOutput for Result<i32, AnyError> {
+  }
+  
+  impl SubcommandOutput for Result<i32, AnyError> {
     fn output(self) -> Result<i32, AnyError> {
-        self
+      self
     }
-}
-
-impl SubcommandOutput for Result<(), AnyError> {
+  }
+  
+  impl SubcommandOutput for Result<(), AnyError> {
     fn output(self) -> Result<i32, AnyError> {
-        self.map(|_| 0)
+      self.map(|_| 0)
     }
-}
-
-impl SubcommandOutput for Result<(), std::io::Error> {
+  }
+  
+  impl SubcommandOutput for Result<(), std::io::Error> {
     fn output(self) -> Result<i32, AnyError> {
-        self.map(|_| 0).map_err(|e| e.into())
+      self.map(|_| 0).map_err(|e| e.into())
     }
-}
+  }
+  
+  
 
 #[allow(clippy::print_stderr)]
 fn setup_panic_hook() {
@@ -181,10 +174,12 @@ fn exit_for_error(error: AnyError) -> ! {
 /// the callchain (especially in debug mode when Rust doesn't have a chance to elide copies!).
 #[inline(always)]
 fn spawn_subcommand<F: Future<Output = T> + 'static, T: SubcommandOutput>(
-    f: F,
+  f: F,
 ) -> JoinHandle<Result<i32, AnyError>> {
-    // the boxed_local() is important in order to get windows to not blow the stack in debug
-    deno_core::unsync::spawn(async move { f.map(|r| r.output()).await }.boxed_local())
+  // the boxed_local() is important in order to get windows to not blow the stack in debug
+  deno_core::unsync::spawn(
+    async move { f.map(|r| r.output()).await }.boxed_local(),
+  )
 }
 
 async fn run_subcommand(flags: Flags) -> Result<i32, AnyError> {
@@ -299,7 +294,7 @@ async fn run_subcommand(flags: Flags) -> Result<i32, AnyError> {
               PathBuf::from(coverage_dir).canonicalize()?,
             );
           }
-
+  
           if test_flags.watch.is_some() {
             tools::test::run_tests_with_watch(flags, test_flags).await
           } else {
@@ -333,112 +328,12 @@ async fn run_subcommand(flags: Flags) -> Result<i32, AnyError> {
         tools::registry::publish(flags, publish_flags).await
       }),
     };
-
+  
     handle.await?
-}
+  }
+  
 
-// TODO: Make custom error type
-pub struct QronosError(anyhow::Error);
-
-impl From<anyhow::Error> for QronosError {
-    fn from(error: anyhow::Error) -> Self {
-        QronosError(error)
-    }
-}
-
-impl From<JoinError> for QronosError {
-    fn from(error: JoinError) -> Self {
-        QronosError(anyhow::Error::new(error))
-    }
-}
-
-impl<'r> Responder<'r, 'static> for QronosError {
-    fn respond_to(self, _request: &'r rocket::Request<'_>) -> rocket::response::Result<'static> {
-        let error = self.0;
-        let status = rocket::http::Status::InternalServerError;
-        let message = error.to_string();
-        let response = rocket::response::Response::build()
-            .status(status)
-            .sized_body(message.len(), std::io::Cursor::new(message))
-            .finalize();
-        Ok(response)
-    }
-}
-
-async fn maybe_npm_install(factory: &CliFactory) -> Result<(), AnyError> {
-    // ensure an "npm install" is done if the user has explicitly
-    // opted into using a managed node_modules directory
-    if factory.cli_options().node_modules_dir_enablement() == Some(true) {
-        if let Some(npm_resolver) = factory.npm_resolver().await?.as_managed() {
-            npm_resolver.ensure_top_level_package_json_install().await?;
-        }
-    }
-    Ok(())
-}
-
-pub async fn run_code(flags: Flags, source: &str) -> Result<i32, AnyError> {
-    let factory = CliFactory::from_flags(flags)?;
-    let cli_options = factory.cli_options();
-    let main_module = cli_options.resolve_main_module()?;
-
-    maybe_npm_install(&factory).await?;
-
-    let file_fetcher = factory.file_fetcher()?;
-    let worker_factory = factory.create_cli_main_worker_factory().await?;
-    let permissions = PermissionsContainer::new(Permissions::from_options(
-        &cli_options.permissions_options()?,
-    )?);
-    // let mut source = Vec::new();
-    // Save a fake file into file fetcher cache
-    // to allow module access by TS compiler
-    file_fetcher.insert_memory_files(File {
-        specifier: main_module.clone(),
-        maybe_headers: None,
-        source: source.as_bytes().into(),
-    });
-
-    let mut worker = worker_factory
-        .create_main_worker(WorkerExecutionMode::Run, main_module, permissions)
-        .await?;
-    let exit_code = worker.run().await?;
-    Ok(exit_code)
-}
-
-#[get("/")]
-pub async fn index() -> Result<&'static str, QronosError> {
-    std::thread::spawn(move || {
-        let code = r#"
-        import chalk from 'npm:chalk';
-        console.log(chalk.blue.bgRed.bold('Hello from JS!'));
-        "#
-        .to_string();
-
-        let mut flags = Flags::default();
-        // TODO: DELETE THIS
-        flags.permissions.allow_all = true;
-        flags.permissions.allow_env = Some(vec![
-            "FORCE_COLOR".to_string(),
-            "TF_BUILD".to_string(),
-            "TERM".to_string(),
-            "CI".to_string(),
-            "TEAMCITY_VERSION".to_string(),
-            "COLORTERM".to_string(),
-        ]);
-        // flags.permissions.allow_env = true;
-        // let eval_flags = EvalFlags { print: false, code };
-        create_and_run_current_thread_with_maybe_metrics(async move {
-            // tools::run::eval_command(flags, eval_flags).await
-            run_code(flags, &code).await
-            // spawn_subcommand(async move { tools::run::eval_command(flags, eval_flags).await }).await
-        })
-    })
-    .join()
-    .unwrap()?;
-    Ok("Done!")
-}
-
-#[launch]
-pub fn rocket() -> _ {
+pub fn main() {
     setup_panic_hook();
 
     util::unix::raise_fd_limit();
@@ -450,8 +345,49 @@ pub fn rocket() -> _ {
         Box::new(util::draw_thread::DrawThread::show),
     );
 
-    let mut config = rocket::Config::debug_default();
-    config.port = 8080;
+    let args: Vec<_> = env::args_os().collect();
+    let future = async move {
+        // NOTE(lucacasonato): due to new PKU feature introduced in V8 11.6 we need to
+        // initialize the V8 platform on a parent thread of all threads that will spawn
+        // V8 isolates.
+        let flags = resolve_flags_and_init(args)?;
+        run_subcommand(flags).await
+    };
 
-    rocket::build().configure(config).mount("/", routes![index])
+    match create_and_run_current_thread_with_maybe_metrics(future) {
+        Ok(exit_code) => std::process::exit(exit_code),
+        Err(err) => exit_for_error(err),
+    }
 }
+// use std::collections::HashMap;
+
+// #[op2(fast)]
+// fn op_is_node_file() -> bool {
+//   false
+// }
+
+// fn foo() {
+
+
+
+// deno_core::extension!(deno_tsc,
+//   ops = [op_is_node_file],
+//   js = [
+//     dir "tsc",
+//     "00_typescript.js",
+//     "99_main_compiler.js",
+//   ],
+//   options = {
+//     op_crate_libs: HashMap<&'static str, PathBuf>,
+//     build_libs: Vec<&'static str>,
+//     path_dts: PathBuf,
+//   },
+//   state = |state, options| {
+//     state.put(options.op_crate_libs);
+//     state.put(options.build_libs);
+//     state.put(options.path_dts);
+//   },
+// );
+
+
+// }

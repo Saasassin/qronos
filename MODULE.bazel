@@ -172,7 +172,11 @@ crate = use_extension(
 crate.from_cargo(
     name = "crates",
     cargo_lockfile = "//backend/rust:Cargo.lock",
-    manifests = ["//backend/rust:Cargo.toml"],
+    manifests = [
+        "//backend/rust:Cargo.toml",
+        # "//third_party:deno/runtime/Cargo.toml",
+        # "//third_party:deno/cli/Cargo.toml",
+    ],
 )
 
 use_repo(crate, "crates")
@@ -217,6 +221,17 @@ crate.annotation(
     build_script_tools = [
         "@com_google_protobuf//:protoc",
     ],
+    repositories = ["crates"],
+    version = "*",
+)
+
+crate.annotation(
+    crate = "deno",
+    build_script_data_glob = ["tsc/**/*.ts", "tsc/**/*.js"],
+    # build_script_rundir = "external/rules_rust~~crate~crates__deno-1.45.0",
+    # build_script_rustc_env = {
+    #     "BUILD_SCRIPT_PATH": "$(execpath @crates//:deno)"
+    # },
     repositories = ["crates"],
     version = "*",
 )

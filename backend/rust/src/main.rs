@@ -7,6 +7,7 @@
 extern crate rocket;
 
 use args::EvalFlags;
+use args::RunFlags;
 use deno::*;
 use deno_core::op2;
 use deno_runtime::deno_permissions::Permissions;
@@ -328,7 +329,6 @@ async fn run_subcommand(flags: Flags) -> Result<i32, AnyError> {
       DenoSubcommand::Vendor(vendor_flags) => spawn_subcommand(async {
         tools::vendor::vendor(flags, vendor_flags).await
       }),
-      // TODO:
       DenoSubcommand::Publish(publish_flags) => spawn_subcommand(async {
         tools::registry::publish(flags, publish_flags).await
       }),
@@ -388,7 +388,6 @@ pub async fn run_code(flags: Flags, source: &str) -> Result<i32, AnyError> {
     let permissions = PermissionsContainer::new(Permissions::from_options(
         &cli_options.permissions_options()?,
     )?);
-    // let mut source = Vec::new();
     // Save a fake file into file fetcher cache
     // to allow module access by TS compiler
     file_fetcher.insert_memory_files(File {
@@ -414,23 +413,10 @@ pub async fn index() -> Result<&'static str, QronosError> {
         .to_string();
 
         let mut flags = Flags::default();
-        // TODO: DELETE THIS
-        flags.permissions.allow_all = true;
-        flags.permissions.allow_env = Some(vec![
-            "FORCE_COLOR".to_string(),
-            "TF_BUILD".to_string(),
-            "TERM".to_string(),
-            "CI".to_string(),
-            "TEAMCITY_VERSION".to_string(),
-            "COLORTERM".to_string(),
-        ]);
-        // flags.permissions.allow_env = true;
-        // let eval_flags = EvalFlags { print: false, code };
-        create_and_run_current_thread_with_maybe_metrics(async move {
-            // tools::run::eval_command(flags, eval_flags).await
-            run_code(flags, &code).await
-            // spawn_subcommand(async move { tools::run::eval_command(flags, eval_flags).await }).await
-        })
+        flags.permissions.no_prompt = true;
+        create_and_run_current_thread_with_maybe_metrics(
+            async move { run_code(flags, &code).await },
+        )
     })
     .join()
     .unwrap()?;

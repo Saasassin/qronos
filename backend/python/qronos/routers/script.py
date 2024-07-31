@@ -5,7 +5,7 @@ from sqlalchemy import func
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from qronos.db import Script, ScriptVersion, ScriptSchedule, get_session
+from qronos.db import Script, ScriptPublic, ScriptVersion, ScriptSchedule, get_session
 from sqlmodel import Session, select
 
 router = APIRouter()
@@ -17,20 +17,18 @@ class ScriptWithVersion(BaseModel):
     script: Script
     script_version: ScriptVersion
    
-@router.get("/scripts", tags=["Script Methods"], response_model=list[Script])
+@router.get("/scripts", tags=["Script Methods"], response_model=list[ScriptPublic])
 async def read_scripts(session: Session = Depends(get_session), skip: int = 0, limit: int = 25, sort: str = "id", order: str = "ASC"):
-
     statement = select(Script).offset(skip).limit(limit).order_by(sa.text("script." + sort + " " + order))
     #statement = select(Script).offset(skip).limit(limit).order_by(sa.text(sort + " " + order))
-    results = session.exec(statement)
+    results = session.exec(statement).all()
 
-    # print results
     for script in results:
         print(script)
         if (script.script_schedule):
             print(script.script_schedule)
 
-    return results.all()
+    return results
 
 
 @router.get("/scripts/full", tags=["Script Methods"], response_model=list[Script])

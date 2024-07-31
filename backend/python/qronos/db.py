@@ -17,9 +17,7 @@ class ScriptType(str, enum.Enum):
     API = "API"
     RUNNABLE = "RUNNABLE"
 
-class Script(SQLModel, table=True, extend_existing=True):
-    __tablename__ = "script"
-    __table_args__ = {"extend_existing": True}
+class ScriptBase(SQLModel):
     id: UUID = Field(default=None, primary_key=True)
     script_name: str = Field(unique=True, nullable=False)
     script_type: ScriptType = Field(sa_column=Column(Enum(ScriptType), nullable=False))
@@ -27,7 +25,13 @@ class Script(SQLModel, table=True, extend_existing=True):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
     created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
 
+class Script(ScriptBase, table=True, extend_existing=True):
+    __tablename__ = "script"
+    __table_args__ = {"extend_existing": True}
     script_schedule : Optional["ScriptSchedule"] = Relationship(back_populates="script",sa_relationship_kwargs={"lazy": "joined"})
+
+class ScriptPublic(ScriptBase):
+    script_schedule: Optional["ScriptSchedule"]
 
 class ScriptSchedule(SQLModel, table=True, extend_existing=True):
     __tablename__ = "script_schedule"

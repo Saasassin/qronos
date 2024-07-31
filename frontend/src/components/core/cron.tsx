@@ -92,7 +92,7 @@ export const CronDiv = () => {
         <Divider>OR</Divider>
 
         <Cron
-          className="my-project-cron"
+          //className="my-project-cron"
           value={values.cronValue}
           setValue={(newValue: string) => {
             dispatchValues({
@@ -111,7 +111,7 @@ export const CronDiv = () => {
         </div>
 
         <p style={{ marginTop: 20 }}>
-          Error: {error ? error.description : "undefined"}
+          Error: {error ? error.description : "No Errors"}
         </p>
       </div>{" "}
     </>

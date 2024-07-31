@@ -5,7 +5,7 @@ from sqlalchemy import func
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from qronos.db import Script, ScriptVersion, get_session
+from qronos.db import Script, ScriptVersion, ScriptSchedule, get_session
 from sqlmodel import Session, select
 
 router = APIRouter()
@@ -20,10 +20,28 @@ class ScriptWithVersion(BaseModel):
 @router.get("/scripts", tags=["Script Methods"], response_model=list[Script])
 async def read_scripts(session: Session = Depends(get_session), skip: int = 0, limit: int = 25, sort: str = "id", order: str = "ASC"):
 
-    statement = select(Script).offset(skip).limit(limit).order_by(sa.text(sort + " " + order))
-#    statement = select(Script).offset(skip).limit(25).order_by(sa.text(sort + " " + order))
+    statement = select(Script).offset(skip).limit(limit).order_by(sa.text("script." + sort + " " + order))
+    #statement = select(Script).offset(skip).limit(limit).order_by(sa.text(sort + " " + order))
+    results = session.exec(statement)
 
-    results = session.exec(statement)  
+    # print results
+    for script in results:
+        print(script)
+        if (script.script_schedule):
+            print(script.script_schedule)
+
+    return results.all()
+
+
+@router.get("/scripts/full", tags=["Script Methods"], response_model=list[Script])
+async def read_scripts_full(session: Session = Depends(get_session), skip: int = 0, limit: int = 25, sort: str = "id", order: str = "ASC"):
+
+    statement = select(Script).offset(skip).limit(limit).order_by(sa.text(sort + " " + order))
+    results = session.exec(statement)
+
+    # greedy fetch ScriptSchedule
+    for script in results:
+        script.script_schedule
     return results.all()
 
 @router.get("/scripts/count", tags=["Script Methods"], response_model=int)
@@ -93,7 +111,6 @@ async def delete_script(script_id: str, session: Session = Depends(get_session))
     """
     existing_script = session.exec(select(Script).where(Script.id == script_id)).first()
     if existing_script:
-        #     statement = select(Script, ScriptVersion).where(Script.id == script_id).join(ScriptVersion).where(ScriptVersion.id == Script.current_version_id)
         statement = select(ScriptVersion).where(ScriptVersion.script_id == script_id)
         versions = session.exec(statement).all()
         for version in versions:
@@ -109,3 +126,12 @@ async def read_script_versions(script_id: str, session: Session = Depends(get_se
     Fetches all versions of a script by its ID.
     """
     return session.exec(select(ScriptVersion).where(ScriptVersion.script_id == script_id)).all()
+
+@router.post("/schedule/{script_id}", tags=["Schedule Methods"], response_model=Script | None)
+async def schedule_script(script_id: str, cron_expression: str, session: Session = Depends(get_session)):
+    """
+    Save a cron expression to schedule a script.
+    """
+    session.add(ScriptSchedule(id=uuid.uuid4(), cron_expression=cron_expression, script_id=script_id))
+    session.commit()
+    return None

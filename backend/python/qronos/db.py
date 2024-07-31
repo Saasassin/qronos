@@ -4,7 +4,7 @@ from typing import Optional
 from uuid import UUID
 
 from qronos.settings import SETTINGS, Env
-from sqlmodel import JSON, Column, Enum, Field, Session, SQLModel, create_engine
+from sqlmodel import JSON, Column, Enum, Field, Relationship, Session, SQLModel, create_engine
 
 
 class ScriptType(str, enum.Enum):
@@ -17,7 +17,6 @@ class ScriptType(str, enum.Enum):
     API = "API"
     RUNNABLE = "RUNNABLE"
 
-  
 class Script(SQLModel, table=True, extend_existing=True):
     __tablename__ = "script"
     __table_args__ = {"extend_existing": True}
@@ -28,21 +27,24 @@ class Script(SQLModel, table=True, extend_existing=True):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
     created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
 
+    script_schedule : Optional["ScriptSchedule"] = Relationship(back_populates="script",sa_relationship_kwargs={"lazy": "joined"})
+
+class ScriptSchedule(SQLModel, table=True, extend_existing=True):
+    __tablename__ = "script_schedule"
+    __table_args__ = {"extend_existing": True}
+    id: UUID = Field(default=None, primary_key=True)
+    cron_expression: str
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
+    script_id: UUID = Field(default=None, foreign_key="script.id", nullable=False)
+    script: Optional["Script"] = Relationship(back_populates="script_schedule")
+
 class ScriptVersion(SQLModel, table=True, extend_existing=True):
     __tablename__ = "script_version"
     __table_args__ = {"extend_existing": True}
     id: UUID = Field(default=None, primary_key=True)
     code_body: str
     script_id: UUID = Field(default=None, nullable=False)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
-
-class ScriptSchedule(SQLModel, table=True, extend_existing=True):
-    __tablename__ = "script_schedule"
-    __table_args__ = {"extend_existing": True}
-    id: UUID = Field(default=None, primary_key=True)
-    script_id: UUID = Field(default=None, foreign_key="script.id", nullable=False)
-    cron_expression: str
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
     created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
 
 class RunHistory(SQLModel, table=True, extend_existing=True):

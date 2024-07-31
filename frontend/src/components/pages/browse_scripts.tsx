@@ -149,10 +149,12 @@ const BrowseTable = () => {
   };
 
   const showCronModal = (script_id: string = "") => {
+    // open the drawer to show the cron modal htmlFor="my-drawer-4"
     const cronModal = document.getElementById(
-      "cron_modal"
-    ) as HTMLDialogElement;
-    cronModal?.showModal();
+      "my-drawer-4"
+    ) as HTMLInputElement;
+
+    cronModal.checked = true;
   };
 
   const showDeleteModal = (script_id: string = "") => {
@@ -302,7 +304,6 @@ const BrowseTable = () => {
       <div className="drawer drawer-end">
         <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content">
-          {/* Page content here */}
           <label
             htmlFor="my-drawer-4"
             className="drawer-button btn btn-primary"

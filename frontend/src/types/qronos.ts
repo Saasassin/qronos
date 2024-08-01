@@ -44,6 +44,15 @@ export const ScriptVersion = t.type({
 export type ScriptVersion = t.TypeOf<typeof ScriptVersion>;
 export type ScriptVersions = ScriptVersion[];
 
+export const Schedule = t.type({
+  id: t.number,
+  script_id: t.string,
+  cron_expression: t.string,
+  created_at: t.union([t.string, t.undefined]),
+  updated_at: t.union([t.string, t.undefined]),
+});
+export type Schedule = t.TypeOf<typeof Schedule>;
+
 export const Script = t.type({
   id: t.union([t.string, t.undefined]),
   script_name: t.string,
@@ -51,6 +60,7 @@ export const Script = t.type({
   script_type: t.string,
   created_at: t.union([t.string, t.undefined]),
   updated_at: t.union([t.string, t.undefined]),
+  script_schedule: t.union([Schedule, t.undefined]),
 });
 export type Script = t.TypeOf<typeof Script>;
 

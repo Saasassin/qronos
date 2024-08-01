@@ -124,12 +124,3 @@ async def read_script_versions(script_id: str, session: Session = Depends(get_se
     Fetches all versions of a script by its ID.
     """
     return session.exec(select(ScriptVersion).where(ScriptVersion.script_id == script_id)).all()
-
-@router.post("/schedule/{script_id}", tags=["Schedule Methods"], response_model=Script | None)
-async def schedule_script(script_id: str, cron_expression: str, session: Session = Depends(get_session)):
-    """
-    Save a cron expression to schedule a script.
-    """
-    session.add(ScriptSchedule(id=uuid.uuid4(), cron_expression=cron_expression, script_id=script_id))
-    session.commit()
-    return None

@@ -23,7 +23,11 @@ import "react-js-cron/dist/styles.css";
 import { Link } from "react-router-dom";
 import { Script } from "../../types/qronos";
 import { CronDiv } from "../core/cron";
-import { formatDateAndTime } from "../dateutils";
+import {
+  formatDateAndTime,
+  getNextScheduledDate,
+  getPreviousScheduledDate,
+} from "../dateutils";
 import {
   deleteScript,
   fetchScripts,
@@ -94,6 +98,50 @@ const BrowseTable = () => {
       header: "Created At",
       cell: (row) => formatDateAndTime(row.getValue()),
     }),
+    {
+      id: "previous_run",
+      enableSorting: false,
+      header: "Previous Run",
+      cell: (prop: any) => {
+        console.log("prop: ", prop);
+        if (prop.row.original.script_type === "RUNNABLE") {
+          const cron_expression =
+            prop.row.original.script_schedule?.cron_expression;
+
+          if (cron_expression === undefined || cron_expression === "") {
+            return (
+              <div className="badge badge-outline badge-warning">
+                Unscheduled
+              </div>
+            );
+          } else {
+            return getPreviousScheduledDate(cron_expression || "");
+          }
+        }
+      },
+    },
+    {
+      id: "next_run",
+      enableSorting: false,
+      header: "Next Run",
+      cell: (prop: any) => {
+        console.log("prop: ", prop);
+        if (prop.row.original.script_type === "RUNNABLE") {
+          const cron_expression =
+            prop.row.original.script_schedule?.cron_expression;
+
+          if (cron_expression === undefined || cron_expression === "") {
+            return (
+              <div className="badge badge-outline badge-warning">
+                Unscheduled
+              </div>
+            );
+          } else {
+            return getNextScheduledDate(cron_expression || "");
+          }
+        }
+      },
+    },
   ];
 
   const tableInstance = useReactTable({
@@ -249,9 +297,9 @@ const BrowseTable = () => {
         </table>
         <p className="float-right text-xs mr-2 mt-3 text-neutral-500 ">
           Page {tableInstance.getState().pagination.pageIndex + 1} of{" "}
-          {tableInstance.getPageCount()}. Showing{" "}
-          {tableInstance.getState().pagination.pageSize} of{" "}
-          {tableInstance.getRowCount()} scripts.
+          {tableInstance.getPageCount()}. Total {tableInstance.getRowCount()}{" "}
+          scripts.
+          {/* {tableInstance.getState().pagination.pageSize} Per Page. */}
         </p>
         <div className="join justify-center w-full mt-4">
           <button

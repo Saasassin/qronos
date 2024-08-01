@@ -1,6 +1,6 @@
 import enum
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Literal, Optional
 from uuid import UUID
 
 from qronos.settings import SETTINGS, Env
@@ -26,6 +26,9 @@ class ScriptBase(SQLModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
 
 class Script(ScriptBase, table=True, extend_existing=True):
+    """ 
+    This was added to support having a nested relationship in the ScriptPublic model with the script_schedule.
+    """
     __tablename__ = "script"
     __table_args__ = {"extend_existing": True}
     script_schedule : Optional["ScriptSchedule"] = Relationship(back_populates="script",sa_relationship_kwargs={"lazy": "joined"})
@@ -42,6 +45,7 @@ class ScriptSchedule(SQLModel, table=True, extend_existing=True):
     created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
     script_id: UUID = Field(default=None, foreign_key="script.id", nullable=False)
     script: Optional["Script"] = Relationship(back_populates="script_schedule")
+
 
 class ScriptVersion(SQLModel, table=True, extend_existing=True):
     __tablename__ = "script_version"

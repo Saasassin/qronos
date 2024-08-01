@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
+from backend.python.qronos.routers import schedule
 from qronos.routers import default, history, runner, script, settings, user
 from fastapi.middleware.cors import CORSMiddleware
 
 tags_metadata = [
     {"name": "Runner Methods"},
+    {"name": "Schedule Methods"},
     {"name": "Script Methods"},
     {"name": "Run History Methods"},
     {"name": "User Methods"},
@@ -35,6 +37,7 @@ origins = ["*"]
 
 app = FastAPI(openapi_tags=tags_metadata)
 app.include_router(script.router)
+app.include_router(schedule.router)
 app.include_router(runner.router)
 app.include_router(history.router)
 app.include_router(user.router)

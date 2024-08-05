@@ -12,7 +12,9 @@ use deno::*;
 use deno_core::op2;
 use deno_runtime::deno_permissions::Permissions;
 use deno_runtime::deno_permissions::PermissionsContainer;
+use rocket::fairing::AdHoc;
 use rocket::response::Responder;
+use rocket::State;
 use tokio::task::JoinError;
 
 use crate::args::flags_from_vec;
@@ -403,15 +405,19 @@ pub async fn run_code(flags: Flags, source: &str) -> Result<i32, AnyError> {
     Ok(exit_code)
 }
 
-#[get("/")]
-pub async fn index() -> Result<&'static str, QronosError> {
-    std::thread::spawn(move || {
-        let code = r#"
-        import chalk from 'npm:chalk';
-        console.log(chalk.blue.bgRed.bold('Hello from JS!'));
-        "#
-        .to_string();
+type DbPool = sqlx::SqlitePool;
 
+async fn get_code(pool: &DbPool, version: String) -> anyhow::Result<String> {
+    let code = sqlx::query!("SELECT * FROM script_version WHERE id = ?", version)
+        .fetch_one(pool)
+        .await?;
+    Ok(code.code_body)
+}
+
+#[get("/scripts/http/<version>")]
+pub async fn index(version: String, pool: &State<DbPool>) -> Result<&'static str, QronosError> {
+    let code = get_code(pool, version).await?;
+    std::thread::spawn(move || {
         let mut flags = Flags::default();
         flags.permissions.no_prompt = true;
         create_and_run_current_thread_with_maybe_metrics(
@@ -439,5 +445,10 @@ pub fn rocket() -> _ {
     let mut config = rocket::Config::debug_default();
     config.port = 8080;
 
-    rocket::build().configure(config).mount("/", routes![index])
+    rocket::build()
+        .configure(config)
+        .mount("/", routes![index])
+        .attach(AdHoc::on_ignite("Database", |rocket| async {
+            rocket.manage(DbPool::connect(&std::env!("DATABASE_URL")).await.unwrap())
+        }))
 }

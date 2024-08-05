@@ -40,12 +40,11 @@ class ScriptSchedule(SQLModel, table=True, extend_existing=True):
     __tablename__ = "script_schedule"
     __table_args__ = {"extend_existing": True}
     id: UUID = Field(default=None, primary_key=True)
-    cron_expression: str
+    cron_expression: str = Field(default=None, nullable=True)
     updated_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
     created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
     script_id: UUID = Field(default=None, foreign_key="script.id", nullable=False)
     script: Optional["Script"] = Relationship(back_populates="script_schedule")
-
 
 class ScriptVersion(SQLModel, table=True, extend_existing=True):
     __tablename__ = "script_version"

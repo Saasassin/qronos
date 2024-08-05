@@ -45,8 +45,8 @@ export type ScriptVersion = t.TypeOf<typeof ScriptVersion>;
 export type ScriptVersions = ScriptVersion[];
 
 export const Schedule = t.type({
-  id: t.number,
-  script_id: t.string,
+  id: t.union([t.string, t.undefined]),
+  script_id: t.union([t.string, t.undefined]),
   cron_expression: t.string,
   created_at: t.union([t.string, t.undefined]),
   updated_at: t.union([t.string, t.undefined]),

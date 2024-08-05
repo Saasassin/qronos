@@ -1,4 +1,4 @@
-import { ScriptWithVersion } from "../../types/qronos";
+import { Schedule, ScriptWithVersion } from "../../types/qronos";
 
 const BASE_URI = import.meta.env.QRONOS_API_URL || "http://?????????????"; // TODO: Fill in the correct URL for default
 
@@ -61,5 +61,28 @@ export const deleteScript = async (id: string) => {
   const response = await fetch(`${BASE_URI}/scripts/${id}`, {
     method: "DELETE",
   });
+  return response;
+};
+
+export const saveOrUpdateSchedule = async (schedule: Schedule) => {
+  const post_body = {
+    id: schedule.id,
+    script_id: schedule.script_id,
+    cron_expression: schedule.cron_expression,
+  };
+
+  let target_uri = `${BASE_URI}/schedule`;
+  if (schedule.id) {
+    target_uri = `${BASE_URI}/schedule/${schedule.id}`;
+  }
+
+  const response = await fetch(target_uri, {
+    method: schedule.id ? "PUT" : "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(post_body),
+  });
+
   return response;
 };

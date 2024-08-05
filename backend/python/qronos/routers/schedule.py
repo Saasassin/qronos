@@ -10,14 +10,16 @@ from sqlmodel import Session, select
 
 router = APIRouter()
 
-@router.post("/schedule/{script_id}", tags=["Schedule Methods"], response_model=ScriptSchedule | None)
-async def schedule_script(script_id: str, cron_expression: str, session: Session = Depends(get_session)):
+@router.post("/schedule", tags=["Schedule Methods"], response_model=ScriptSchedule | None)
+async def create_script_schedule(script_schedule: ScriptSchedule, session: Session = Depends(get_session)):
     """
     Save a cron expression to schedule a script.
     """
-    session.add(ScriptSchedule(id=uuid.uuid4(), cron_expression=cron_expression, script_id=script_id))
-    session.commit()    
-    return session.get(ScriptSchedule, uuid.UUID(script_id))
+    script_schedule.id = uuid.uuid4()
+    session.add(script_schedule)
+    session.commit()
+    session.refresh(script_schedule)
+    return script_schedule
 
 @router.put("/schedule/{script_id}", tags=["Schedule Methods"], response_model=ScriptSchedule | None)
 async def update_script_schedule(script_id: str, cron_expression: str, session: Session = Depends(get_session)):

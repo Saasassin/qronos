@@ -23,21 +23,56 @@ import "react-js-cron/dist/styles.css";
 import { Link } from "react-router-dom";
 import { Script } from "../../types/qronos";
 import { CronDiv } from "../core/cron";
-import {
-  formatDateAndTime,
-  getNextScheduledDate,
-  getPreviousScheduledDate,
-} from "../dateutils";
+import { formatDateAndTime, getNextScheduledDate } from "../dateutils";
 import {
   deleteScript,
   fetchScripts,
   fetchScriptsCount,
+  saveOrUpdateSchedule,
 } from "../services/Client";
 
 const BrowseTable = () => {
   const [data, setData] = useState([]);
   const [count, setCount] = useState(0);
   const [selectedForDelete, setSelectedForDelete] = useState<Script>();
+  const [selectedForCronEdit, setSelectedForCronEdit] = useState<Script>();
+
+  const childToParent = (new_cron_expression: string) => {
+    console.log("childToParent", new_cron_expression);
+
+    // close the drawer
+    const cronModal = document.getElementById(
+      "my-drawer-4"
+    ) as HTMLInputElement;
+    cronModal.checked = false;
+
+    // update the cron expression in the selected script
+    if (selectedForCronEdit === undefined) {
+      console.log("selectedForCronEdit is undefined");
+      return;
+    }
+
+    if (selectedForCronEdit?.script_schedule == undefined) {
+      selectedForCronEdit.script_schedule = {
+        id: "",
+        script_id: selectedForCronEdit.id,
+        cron_expression: new_cron_expression,
+        created_at: "",
+        updated_at: "",
+      };
+    } else {
+      selectedForCronEdit.script_schedule.cron_expression = new_cron_expression;
+    }
+
+    saveOrUpdateSchedule(selectedForCronEdit.script_schedule);
+
+    // clear out the selected script
+    setSelectedForCronEdit(undefined);
+
+    // reload the page
+    //window.location.reload();
+  };
+
   const [sorting, setSorting] = useState<SortingState>([
     { id: "created_at", desc: true },
   ]);
@@ -98,34 +133,15 @@ const BrowseTable = () => {
       header: "Created At",
       cell: (row) => formatDateAndTime(row.getValue()),
     }),
-    {
-      id: "previous_run",
-      enableSorting: false,
-      header: "Previous Run",
-      cell: (prop: any) => {
-        console.log("prop: ", prop);
-        if (prop.row.original.script_type === "RUNNABLE") {
-          const cron_expression =
-            prop.row.original.script_schedule?.cron_expression;
-
-          if (cron_expression === undefined || cron_expression === "") {
-            return (
-              <div className="badge badge-outline badge-warning">
-                Unscheduled
-              </div>
-            );
-          } else {
-            return getPreviousScheduledDate(cron_expression || "");
-          }
-        }
-      },
-    },
+    columnHelper.accessor("updated_at", {
+      header: "Updated At",
+      cell: (row) => formatDateAndTime(row.getValue()),
+    }),
     {
       id: "next_run",
       enableSorting: false,
       header: "Next Run",
       cell: (prop: any) => {
-        console.log("prop: ", prop);
         if (prop.row.original.script_type === "RUNNABLE") {
           const cron_expression =
             prop.row.original.script_schedule?.cron_expression;
@@ -197,6 +213,15 @@ const BrowseTable = () => {
   };
 
   const showCronModal = (script_id: string = "") => {
+    //find the script in the list 'scripts' and set it as selected for cron_edit
+    const script = data.find(
+      (script: { id: string }) => script.id === script_id
+    );
+    if (script) {
+      setSelectedForCronEdit(script);
+    }
+    console.log("selectedForCronEdit", selectedForCronEdit);
+
     // open the drawer to show the cron modal htmlFor="my-drawer-4"
     const cronModal = document.getElementById(
       "my-drawer-4"
@@ -226,7 +251,6 @@ const BrowseTable = () => {
     ) as HTMLDialogElement;
     deleteModal?.close();
 
-    console.log("Deleting script with id: ", script_id);
     deleteScript(script_id);
 
     window.location.reload();
@@ -351,14 +375,6 @@ const BrowseTable = () => {
       {/* BEGIN: CRON MODAL */}
       <div className="drawer drawer-end">
         <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
-        <div className="drawer-content">
-          <label
-            htmlFor="my-drawer-4"
-            className="drawer-button btn btn-primary"
-          >
-            Open drawer
-          </label>
-        </div>
         <div className="drawer-side">
           <label
             htmlFor="my-drawer-4"
@@ -366,7 +382,12 @@ const BrowseTable = () => {
             className="drawer-overlay"
           ></label>
           <div className="menu bg-base-200 text-base-content min-h-full w-1/2 p-4 mt-16">
-            <CronDiv />
+            <CronDiv
+              childToParent={childToParent}
+              defaultValue={
+                selectedForCronEdit?.script_schedule?.cron_expression || ""
+              }
+            />
           </div>
         </div>
       </div>

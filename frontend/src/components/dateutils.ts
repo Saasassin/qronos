@@ -21,7 +21,6 @@ export const getNextScheduledDate = (cronExpression: string) => {
 
   let interval = parser.parseExpression(cronExpression, options);
   let nextDate = interval.next().toString();
-  console.log("Next scheduled date: ", nextDate);
   return formatDateAndTime(nextDate);
 };
 

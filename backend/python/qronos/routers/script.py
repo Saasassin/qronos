@@ -19,28 +19,12 @@ class ScriptWithVersion(BaseModel):
    
 @router.get("/scripts", tags=["Script Methods"], response_model=list[ScriptPublic])
 async def read_scripts(session: Session = Depends(get_session), skip: int = 0, limit: int = 25, sort: str = "id", order: str = "ASC"):
+    """
+    Fetches all scripts with pagination and sorting.
+    """
     statement = select(Script).offset(skip).limit(limit).order_by(sa.text("script." + sort + " " + order))
-    #statement = select(Script).offset(skip).limit(limit).order_by(sa.text(sort + " " + order))
     results = session.exec(statement).all()
-
-    for script in results:
-        print(script)
-        if (script.script_schedule):
-            print(script.script_schedule)
-
     return results
-
-
-@router.get("/scripts/full", tags=["Script Methods"], response_model=list[Script])
-async def read_scripts_full(session: Session = Depends(get_session), skip: int = 0, limit: int = 25, sort: str = "id", order: str = "ASC"):
-
-    statement = select(Script).offset(skip).limit(limit).order_by(sa.text(sort + " " + order))
-    results = session.exec(statement)
-
-    # greedy fetch ScriptSchedule
-    for script in results:
-        script.script_schedule
-    return results.all()
 
 @router.get("/scripts/count", tags=["Script Methods"], response_model=int)
 async def read_script_count(session: Session = Depends(get_session)):
@@ -93,6 +77,7 @@ async def update_script(
         script_version.script_id = script_id
         session.add(script_version)
         existing_script.current_version_id = script_version.id
+        existing_script.updated_at = func.now()
 
         session.add(existing_script)
         session.commit()

@@ -1,5 +1,5 @@
 import { Divider, Input } from "antd";
-import { Dispatch, useReducer, useState } from "react";
+import { Dispatch, useEffect, useReducer, useState } from "react";
 import Cron, { CronError } from "react-js-cron";
 
 /**
@@ -58,10 +58,35 @@ export function useCronReducer(defaultValue: string): [
   return [values, dispatchValues];
 }
 
-export const CronDiv = () => {
-  const defaultValue = "30 5 * * 1,6";
-  const [values, dispatchValues] = useCronReducer(defaultValue);
+export const CronDiv = ({
+  childToParent,
+  defaultValue,
+}: {
+  childToParent: (new_cron_expression: string) => void;
+  defaultValue: string | undefined;
+}) => {
+  const [cronValue, setCronValue] = useState<string | undefined>(defaultValue);
+
+  useEffect(() => {
+    if (defaultValue) {
+      setCronValue(defaultValue);
+      console.log("useEffect: ", defaultValue);
+      dispatchValues({
+        type: "set_values",
+        value: defaultValue,
+      });
+    }
+  }, [defaultValue]);
+
+  const [values, dispatchValues] = useCronReducer(cronValue || "");
   const [error, onError] = useState<CronError>();
+
+  const doCronSave = (new_cron_expression: string) => {
+    console.log("doCronSave: ", new_cron_expression);
+    //setCronValue(undefined);
+    defaultValue = "";
+    childToParent(new_cron_expression);
+  };
 
   return (
     <>
@@ -114,6 +139,14 @@ export const CronDiv = () => {
           Error: {error ? error.description : "No Errors"}
         </p>
       </div>{" "}
+      <div>
+        <button
+          className="btn btn-neutral"
+          onClick={() => doCronSave(values.cronValue)}
+        >
+          Click Parent
+        </button>
+      </div>
     </>
   );
 };

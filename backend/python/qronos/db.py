@@ -43,7 +43,7 @@ class ScriptSchedule(SQLModel, table=True, extend_existing=True):
     cron_expression: str = Field(default=None, nullable=True)
     updated_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
     created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
-    script_id: UUID = Field(default=None, foreign_key="script.id", nullable=False)
+    script_id: UUID = Field(default=None, foreign_key="script.id", nullable=False, unique=True)
     script: Optional["Script"] = Relationship(back_populates="script_schedule")
 
 class ScriptVersion(SQLModel, table=True, extend_existing=True):

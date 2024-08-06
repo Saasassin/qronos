@@ -22,12 +22,12 @@ async def create_script_schedule(script_schedule: ScriptSchedule, session: Sessi
     return script_schedule
 
 @router.put("/schedule/{script_id}", tags=["Schedule Methods"], response_model=ScriptSchedule | None)
-async def update_script_schedule(script_id: str, cron_expression: str, session: Session = Depends(get_session)):
+async def update_script_schedule(script_schedule: ScriptSchedule, session: Session = Depends(get_session)):
     """
     Update the cron expression for a script schedule.
     """
-    existing_schedule = session.exec(select(ScriptSchedule).where(ScriptSchedule.script_id == script_id)).first()
-    existing_schedule.cron_expression = cron_expression
+    existing_schedule = session.exec(select(ScriptSchedule).where(ScriptSchedule.script_id == script_schedule.script_id )).first()
+    existing_schedule.cron_expression = script_schedule.cron_expression
     session.commit()
     return existing_schedule
 

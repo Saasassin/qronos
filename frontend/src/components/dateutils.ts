@@ -19,9 +19,13 @@ export const getNextScheduledDate = (cronExpression: string) => {
     iterator: false,
   };
 
-  let interval = parser.parseExpression(cronExpression, options);
-  let nextDate = interval.next().toString();
-  return formatDateAndTime(nextDate);
+  try {
+    let interval = parser.parseExpression(cronExpression, options);
+    let nextDate = interval.next().toString();
+    return formatDateAndTime(nextDate);
+  } catch (e) {
+    console.error(e);
+  }
 };
 
 export const getPreviousScheduledDate = (cronExpression: string) => {

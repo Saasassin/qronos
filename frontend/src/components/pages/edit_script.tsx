@@ -15,6 +15,7 @@ import cssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
 import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
 import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
+import { FaRegHourglass } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import { ScriptWithVersion } from "../../types/qronos";
 import { fetchScript, saveOrUpdateScript } from "../services/Client";
@@ -102,9 +103,10 @@ const EditScript = () => {
     script: {
       id: undefined,
       script_name: generateSlug(3, { format: "kebab" }),
-      script_type: "RUNNABLE",
+      script_type: undefined,
       created_at: undefined,
       updated_at: undefined,
+      script_schedule: undefined,
     },
     script_version: {
       id: undefined,
@@ -122,26 +124,36 @@ const EditScript = () => {
   // initialize save button dirty state
   const [isDirty, setIsDirtyForm] = useState(false);
 
+  // initialize whether we can schedule the script
+  const [isCronable, setIsCronable] = useState(false);
+
   // initialize page header state
   const [pageTitle, setPageTitle] = useState("Create Script");
 
   const { id } = useParams();
 
+  const cron_tooltip = isCronable ? "Schedule" : "Not a Runnable Script";
+
   useEffect(() => {
     if (id) {
-      console.log("Editing Script ID: ", id);
       fetchScript(id).then((data) => {
-        console.log("Fetched Script: ", data);
         setFormData(data);
-      });
-    }
 
-    if (formData.script.id) {
-      setPageTitle("Edit Script");
-      document.title = "Qronos | Edit Script";
-    } else {
-      setPageTitle("Create Script");
-      document.title = "Qronos | Create Script";
+        if (id) {
+          //console.log("Editing Script: ", data.script.script_name);
+          setPageTitle("Edit Script");
+          document.title = "Qronos | Edit Script";
+          if (data.script.script_type === "RUNNABLE") {
+            setIsCronable(true);
+          } else {
+            setIsCronable(false);
+          }
+        } else {
+          //console.log("Creating Script");
+          setPageTitle("Create Script");
+          document.title = "Qronos | Create Script";
+        }
+      });
     }
   }, [id]);
 
@@ -174,6 +186,11 @@ const EditScript = () => {
       },
     });
 
+    if (value === "RUNNABLE") {
+      setIsCronable(true);
+    } else {
+      setIsCronable(false);
+    }
     setIsDirtyForm(true);
   };
 
@@ -267,6 +284,21 @@ const EditScript = () => {
             </div>
             <div className="sm:col-span-1">
               <div className="join float-right mr-5">
+                <div className="tooltip" data-tip={`${cron_tooltip}`}>
+                  <button
+                    type="button"
+                    className={`btn btn-primary join-item ${
+                      isCronable ? "" : "btn-disabled"
+                    }`}
+                    onClick={() => {}}
+                  >
+                    <IconContext.Provider
+                      value={{ className: "react-icon-button" }}
+                    >
+                      <FaRegHourglass />
+                    </IconContext.Provider>
+                  </button>
+                </div>
                 <button className="btn join-item">
                   <IconContext.Provider
                     value={{ className: "react-icon-button" }}
@@ -275,7 +307,6 @@ const EditScript = () => {
                   </IconContext.Provider>
                   Preview
                 </button>
-
                 <button
                   type="button"
                   className={`btn btn-primary join-item ${
@@ -332,7 +363,6 @@ const EditScript = () => {
                 </IconContext.Provider>
                 Preview
               </button>
-
               <button
                 type="button"
                 className={`btn btn-primary join-item ${

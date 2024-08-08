@@ -1,4 +1,4 @@
-import { Divider, Input } from "antd";
+import { Input } from "antd";
 import { Dispatch, useEffect, useReducer, useState } from "react";
 import Cron, { CronError } from "react-js-cron";
 
@@ -59,40 +59,41 @@ export function useCronReducer(defaultValue: string): [
 }
 
 export const CronDiv = ({
-  childToParent,
+  saveCronFn,
+  script_name,
   defaultValue,
 }: {
-  childToParent: (new_cron_expression: string) => void;
+  saveCronFn: (new_cron_expression: string) => void;
+  script_name: string;
   defaultValue: string | undefined;
 }) => {
   const [cronValue, setCronValue] = useState<string | undefined>(defaultValue);
 
   useEffect(() => {
-    if (defaultValue) {
-      setCronValue(defaultValue);
-      console.log("useEffect: ", defaultValue);
-      dispatchValues({
-        type: "set_values",
-        value: defaultValue,
-      });
-    }
+    setCronValue(defaultValue);
+    console.log("useEffect: ", defaultValue);
+    dispatchValues({
+      type: "set_values",
+      value: defaultValue || "",
+    });
   }, [defaultValue]);
 
   const [values, dispatchValues] = useCronReducer(cronValue || "");
   const [error, onError] = useState<CronError>();
 
   const doCronSave = (new_cron_expression: string) => {
-    console.log("doCronSave: ", new_cron_expression);
-    //setCronValue(undefined);
     defaultValue = "";
-    childToParent(new_cron_expression);
+    saveCronFn(new_cron_expression); // this calls back to the parent.
   };
 
   return (
     <>
-      <h3 className="font-bold text-lg">Schedule Script Run</h3>
+      <h3 className="font-bold text-lg">
+        Schedule Script: <b>'{script_name}'</b>
+      </h3>
       <div className="w-full">
         <Input
+          placeholder="Enter Cron Expression, then Tab or Enter"
           value={values.inputValue}
           onChange={(event: { target: { value: any } }) => {
             dispatchValues({
@@ -114,10 +115,18 @@ export const CronDiv = ({
           }}
         />
 
-        <Divider>OR</Divider>
+        <div className="mt-5 mb-5">... Or select a schedule ...</div>
+        {/* Failed attempt to do dark mode in antd. */}
+        {/* <ConfigProvider
+          theme={{
+            // 1. Use dark algorithm
+            algorithm: theme.darkAlgorithm,
 
+            // 2. Combine dark algorithm and compact algorithm
+            // algorithm: [theme.darkAlgorithm, theme.compactAlgorithm],
+          }}
+        > */}
         <Cron
-          //className="my-project-cron"
           value={values.cronValue}
           setValue={(newValue: string) => {
             dispatchValues({
@@ -127,6 +136,7 @@ export const CronDiv = ({
           }}
           onError={onError}
         />
+        {/* </ConfigProvider> */}
 
         <div>
           <span style={{ fontSize: 12 }}>
@@ -135,17 +145,25 @@ export const CronDiv = ({
           </span>
         </div>
 
-        <p style={{ marginTop: 20 }}>
-          Error: {error ? error.description : "No Errors"}
-        </p>
+        {error && (
+          <div className="text-error mt-5">
+            Error: {error ? error.description : "No Errors"}
+          </div>
+        )}
       </div>{" "}
-      <div>
-        <button
-          className="btn btn-neutral"
-          onClick={() => doCronSave(values.cronValue)}
-        >
-          Click Parent
-        </button>
+      <div className="flex justify-center mt-8">
+        {(!error && (
+          <button
+            className="btn btn-primary content-center"
+            onClick={() => doCronSave(values.cronValue)}
+          >
+            Save Schedule
+          </button>
+        )) || (
+          <button className="btn btn-primary btn-disabled content-center">
+            Save Schedule
+          </button>
+        )}
       </div>
     </>
   );

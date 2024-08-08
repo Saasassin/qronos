@@ -37,7 +37,7 @@ const BrowseTable = () => {
   const [selectedForDelete, setSelectedForDelete] = useState<Script>();
   const [selectedForCronEdit, setSelectedForCronEdit] = useState<Script>();
 
-  const childToParent = (new_cron_expression: string) => {
+  const saveCronFn = (new_cron_expression: string) => {
     console.log("childToParent", new_cron_expression);
 
     // close the drawer
@@ -52,25 +52,18 @@ const BrowseTable = () => {
       return;
     }
 
-    if (selectedForCronEdit?.script_schedule == undefined) {
-      selectedForCronEdit.script_schedule = {
-        id: "",
-        script_id: selectedForCronEdit.id,
-        cron_expression: new_cron_expression,
-        created_at: "",
-        updated_at: "",
-      };
-    } else {
-      selectedForCronEdit.script_schedule.cron_expression = new_cron_expression;
-    }
+    selectedForCronEdit.script_schedule = {
+      id: selectedForCronEdit.script_schedule?.id,
+      script_id: selectedForCronEdit.id,
+      cron_expression: new_cron_expression,
+      created_at: selectedForCronEdit.script_schedule?.created_at,
+      updated_at: undefined,
+    };
 
     saveOrUpdateSchedule(selectedForCronEdit.script_schedule);
 
     // clear out the selected script
     setSelectedForCronEdit(undefined);
-
-    // reload the page
-    //window.location.reload();
   };
 
   const [sorting, setSorting] = useState<SortingState>([
@@ -86,40 +79,47 @@ const BrowseTable = () => {
       header: "",
       enableSorting: false,
 
-      cell: (row) => (
-        <>
-          <div className="join">
-            <div className="tooltip" data-tip="Edit Script">
-              <Link to={`/edit_script/${row.getValue()}`}>
+      cell: (prop: any) => {
+        const isCronable = prop.row.original.script_type === "RUNNABLE";
+        const disable_cron_btn = isCronable ? "" : "btn-disabled";
+        const cron_tooltip = isCronable ? "Schedule" : "Not a Runnable Script";
+        return (
+          <>
+            <div className="join">
+              <div className="tooltip" data-tip="Edit Script">
+                <Link to={`/edit_script/${prop.row.original.id}`}>
+                  <button className="btn btn-sm btn-neutral join-item">
+                    <IoCreateOutline />
+                  </button>
+                </Link>
+              </div>
+              <div className="tooltip" data-tip="Run History">
                 <button className="btn btn-sm btn-neutral join-item">
-                  <IoCreateOutline />
+                  <FaRegChartBar />
+                </button>{" "}
+              </div>
+              {/* {prop.row.original.script_type === "RUNNABLE" && ( */}
+              <div className="tooltip" data-tip={`${cron_tooltip}`}>
+                <button
+                  className={`btn btn-sm btn-neutral join-item ${disable_cron_btn}`}
+                  onClick={() => showCronModal(prop.row.original.id)}
+                >
+                  <FaRegHourglass />
                 </button>
-              </Link>
+              </div>
+              {/* )} */}
+              <div className="tooltip" data-tip="Delete">
+                <button
+                  className="btn btn-sm btn-neutral join-item"
+                  onClick={() => showDeleteModal(prop.row.original.id)}
+                >
+                  <RiDeleteBinLine />
+                </button>{" "}
+              </div>
             </div>
-            <div className="tooltip" data-tip="Run History">
-              <button className="btn btn-sm btn-neutral join-item">
-                <FaRegChartBar />
-              </button>{" "}
-            </div>
-            <div className="tooltip" data-tip="Schedule">
-              <button
-                className="btn btn-sm btn-neutral join-item"
-                onClick={() => showCronModal(row.getValue())}
-              >
-                <FaRegHourglass />
-              </button>{" "}
-            </div>
-            <div className="tooltip" data-tip="Delete">
-              <button
-                className="btn btn-sm btn-neutral join-item"
-                onClick={() => showDeleteModal(row.getValue())}
-              >
-                <RiDeleteBinLine />
-              </button>{" "}
-            </div>
-          </div>
-        </>
-      ),
+          </>
+        );
+      },
     }),
     columnHelper.accessor("script_name", {
       header: "Name",
@@ -127,7 +127,7 @@ const BrowseTable = () => {
     }),
     columnHelper.accessor("script_type", {
       header: "Type",
-      cell: (row) => getScriptTypeIcon(row.getValue()),
+      cell: (row) => getScriptTypeIcon(row.getValue() || ""),
     }),
     columnHelper.accessor("created_at", {
       header: "Created At",
@@ -383,7 +383,8 @@ const BrowseTable = () => {
           ></label>
           <div className="menu bg-base-200 text-base-content min-h-full w-1/2 p-4 mt-16">
             <CronDiv
-              childToParent={childToParent}
+              saveCronFn={saveCronFn}
+              script_name={selectedForCronEdit?.script_name || ""}
               defaultValue={
                 selectedForCronEdit?.script_schedule?.cron_expression || ""
               }

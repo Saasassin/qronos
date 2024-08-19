@@ -20,6 +20,15 @@ export function useCronReducer(defaultValue: string): [
     value: string;
   }>
 ] {
+  // reset prevValues to "" when defaultValue changes
+  const [prevValues, setPrevValues] = useState<{
+    inputValue: string;
+    cronValue: string;
+  }>({
+    inputValue: defaultValue,
+    cronValue: defaultValue,
+  });
+
   const [values, dispatchValues] = useReducer(
     (
       prevValues: {
@@ -55,35 +64,88 @@ export function useCronReducer(defaultValue: string): [
     }
   );
 
+  useEffect(() => {
+    if (prevValues.inputValue !== defaultValue) {
+      dispatchValues({
+        type: "set_values",
+        value: defaultValue,
+      });
+      dispatchValues({
+        type: "set_input_value",
+        value: defaultValue,
+      });
+      dispatchValues({
+        type: "set_cron_value",
+        value: defaultValue,
+      });
+      setPrevValues({
+        inputValue: defaultValue,
+        cronValue: defaultValue,
+      });
+    }
+  }, [defaultValue]);
+
   return [values, dispatchValues];
 }
 
 export const CronDiv = ({
   saveCronFn,
+  deleteCronFn,
   script_name,
   defaultValue,
 }: {
   saveCronFn: (new_cron_expression: string) => void;
+  deleteCronFn: () => void;
   script_name: string;
   defaultValue: string | undefined;
 }) => {
   const [cronValue, setCronValue] = useState<string | undefined>(defaultValue);
+  const [values, dispatchValues] = useCronReducer(cronValue || "");
+  const [error, onError] = useState<CronError>();
 
   useEffect(() => {
     setCronValue(defaultValue);
-    console.log("useEffect: ", defaultValue);
     dispatchValues({
       type: "set_values",
       value: defaultValue || "",
     });
+    dispatchValues({
+      type: "set_input_value",
+      value: defaultValue || "",
+    });
+    dispatchValues({
+      type: "set_cron_value",
+      value: defaultValue || "",
+    });
   }, [defaultValue]);
-
-  const [values, dispatchValues] = useCronReducer(cronValue || "");
-  const [error, onError] = useState<CronError>();
 
   const doCronSave = (new_cron_expression: string) => {
     defaultValue = "";
-    saveCronFn(new_cron_expression); // this calls back to the parent.
+    saveCronFn(new_cron_expression);
+  };
+
+  const doCronDelete = () => {
+    defaultValue = "";
+    dispatchValues({
+      type: "set_values",
+      value: defaultValue,
+    });
+    dispatchValues({
+      type: "set_input_value",
+      value: defaultValue,
+    });
+    dispatchValues({
+      type: "set_cron_value",
+      value: defaultValue,
+    });
+    deleteCronFn();
+    setCronValue(undefined);
+
+    // need to change the prevValues to "" in the useCronReducer
+    //
+    values.cronValue = "";
+    values.inputValue = "";
+    console.log("doCronDeleteOut: ", defaultValue);
   };
 
   return (
@@ -127,6 +189,8 @@ export const CronDiv = ({
           }}
         > */}
         <Cron
+          clearButton={true}
+          clearButtonAction="empty"
           value={values.cronValue}
           setValue={(newValue: string) => {
             dispatchValues({
@@ -162,6 +226,18 @@ export const CronDiv = ({
         )) || (
           <button className="btn btn-primary btn-disabled content-center">
             Save Schedule
+          </button>
+        )}
+        {(defaultValue != "" && (
+          <button
+            className="btn btn-secondary ml-5"
+            onClick={() => doCronDelete()}
+          >
+            Remove Schedule
+          </button>
+        )) || (
+          <button className="btn btn-secondary btn-disabled ml-5">
+            Remove Schedule
           </button>
         )}
       </div>

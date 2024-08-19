@@ -36,7 +36,7 @@ async def delete_script_schedule(script_id: str, session: Session = Depends(get_
     """
     Delete a script schedule.
     """
-    script_schedule = session.get(ScriptSchedule, uuid.UUID(script_id))
-    session.delete(script_schedule)
+    existing_schedule = session.exec(select(ScriptSchedule).where(ScriptSchedule.script_id == script_id)).first()
+    session.delete(existing_schedule)
     session.commit()
     return None

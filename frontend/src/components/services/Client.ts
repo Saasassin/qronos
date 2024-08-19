@@ -86,3 +86,10 @@ export const saveOrUpdateSchedule = async (schedule: Schedule) => {
 
   return response;
 };
+
+export const deleteSchedule = async (id: string) => {
+  const response = await fetch(`${BASE_URI}/schedule/${id}`, {
+    method: "DELETE",
+  });
+  return response;
+};

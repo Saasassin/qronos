@@ -25,6 +25,7 @@ import { Script } from "../../types/qronos";
 import { CronDiv } from "../core/cron";
 import { formatDateAndTime, getNextScheduledDate } from "../dateutils";
 import {
+  deleteSchedule,
   deleteScript,
   fetchScripts,
   fetchScriptsCount,
@@ -38,8 +39,6 @@ const BrowseTable = () => {
   const [selectedForCronEdit, setSelectedForCronEdit] = useState<Script>();
 
   const saveCronFn = (new_cron_expression: string) => {
-    console.log("childToParent", new_cron_expression);
-
     // close the drawer
     const cronModal = document.getElementById(
       "my-drawer-4"
@@ -64,6 +63,30 @@ const BrowseTable = () => {
 
     // clear out the selected script
     setSelectedForCronEdit(undefined);
+  };
+
+  const deleteCronFn = () => {
+    // close the drawer
+    const cronModal = document.getElementById(
+      "my-drawer-4"
+    ) as HTMLInputElement;
+    cronModal.checked = false;
+
+    // on crownModal close, call function
+
+    deleteSchedule(selectedForCronEdit?.script_schedule?.script_id || "");
+
+    // create empty Script object to clear out the selected script
+    const emptyScript: Script = {
+      id: "",
+      script_name: "",
+      script_type: "",
+      created_at: "",
+      updated_at: "",
+      script_schedule: undefined,
+    };
+
+    setSelectedForCronEdit(emptyScript);
   };
 
   const [sorting, setSorting] = useState<SortingState>([
@@ -190,7 +213,7 @@ const BrowseTable = () => {
         setData(data);
       });
     });
-  }, [sorting, pagination]);
+  }, [sorting, pagination, selectedForCronEdit]);
 
   const getScriptTypeIcon = (scriptType: string) => {
     if (scriptType === "RUNNABLE") {
@@ -384,6 +407,7 @@ const BrowseTable = () => {
           <div className="menu bg-base-200 text-base-content min-h-full w-1/2 p-4 mt-16">
             <CronDiv
               saveCronFn={saveCronFn}
+              deleteCronFn={deleteCronFn}
               script_name={selectedForCronEdit?.script_name || ""}
               defaultValue={
                 selectedForCronEdit?.script_schedule?.cron_expression || ""

@@ -8,3 +8,12 @@ load(":const.bzl", "PLATFORMS")
     )
     for name, p in PLATFORMS.items()
 ]
+
+[
+    config_setting(
+        name = "{}_config".format(name),
+        constraint_values = p.constraint_values,
+        visibility = ["//visibility:public"],
+    )
+    for name, p in PLATFORMS.items()
+]

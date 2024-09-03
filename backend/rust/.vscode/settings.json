@@ -1,0 +1,5 @@
+{
+  "rust-analyzer.server.extraEnv": {
+    "DATABASE_URL": "sqlite:/Users/tbess/src/qronos/backend/python/database.db",
+  }
+}

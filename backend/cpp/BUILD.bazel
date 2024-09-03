@@ -1,0 +1,16 @@
+cc_binary(
+    name = "main",
+    srcs = [
+        "main.cpp",
+    ],
+    data = [
+        "lib.mjs",
+        "main.js",
+    ],
+    includes = [
+        "include",
+    ],
+    deps = [
+        "//third_party:v8",
+    ],
+)

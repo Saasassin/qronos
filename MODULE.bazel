@@ -182,7 +182,7 @@ crate.from_cargo(
 use_repo(crate, "crates")
 
 crate.annotation(
-    additive_build_file = "//third_party:BUILD.v8.bazel",
+    additive_build_file = "//third_party:BUILD.rust-v8.bazel",
     crate = "v8",
     gen_build_script = "on",
     # rustc_env = {
@@ -234,4 +234,32 @@ crate.annotation(
     # },
     repositories = ["crates"],
     version = "*",
+)
+
+bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
+git_override(
+    module_name = "hedron_compile_commands",
+    remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
+    commit = "1e08f8e0507b6b6b1f4416a9a22cf5c28beaba93",
+    # Replace the commit hash (above) with the latest (https://github.com/hedronvision/bazel-compile-commands-extractor/commits/main).
+    # Even better, set up Renovate and let it do the work for you (see "Suggestion: Updates" in the README).
+)
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+http_archive(
+    name = "v8_macos",
+    urls = [
+        "https://github.com/kuoruan/libv8/releases/download/v12.8.374.24/v8_macOS_arm64.tar.xz",
+    ],
+    sha256 = "45a355d9948ec04926705dc7cbaa0e10be26d6f52c02808ed62a139437ec1ead",
+    build_file = "//third_party:BUILD.v8.bazel",
+)
+
+http_archive(
+    name = "v8_linux",
+    urls = [
+        "https://github.com/kuoruan/libv8/releases/download/v12.8.374.24/v8_Linux_x64.tar.xz",
+    ],
+    sha256 = "04209ad69bc45a221ab239d03be68cef6066bd3ec2b5caf06c36a3580c54ecda",
+    build_file = "//third_party:BUILD.v8.bazel",
 )

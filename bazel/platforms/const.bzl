@@ -13,6 +13,12 @@ PLATFORMS = {
             "@platforms//cpu:aarch64",
         ],
     ),
+    "macos_aarch64": struct(
+        constraint_values = [
+            "@platforms//os:macos",
+            "@platforms//cpu:aarch64",
+        ],
+    ),
 }
 
 PLATFORM_LABELS = ["//bazel/platforms:{}".format(platform) for platform in PLATFORMS]

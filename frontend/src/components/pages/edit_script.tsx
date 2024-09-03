@@ -103,7 +103,7 @@ const EditScript = () => {
     script: {
       id: undefined,
       script_name: generateSlug(3, { format: "kebab" }),
-      script_type: undefined,
+      script_type: "RUNNABLE",
       created_at: undefined,
       updated_at: undefined,
       script_schedule: undefined,

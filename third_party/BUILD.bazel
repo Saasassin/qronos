@@ -1,0 +1,8 @@
+alias(
+    name = "v8",
+    actual = select({
+        "//bazel/platforms:linux_x86_64_config": "@v8_linux//:v8",
+        "//bazel/platforms:macos_aarch64_config": "@v8_macos//:v8",
+    }),
+    visibility = ["//visibility:public"],
+)

@@ -408,7 +408,8 @@ pub async fn run_code(flags: Flags, source: &str) -> Result<i32, AnyError> {
 type DbPool = sqlx::SqlitePool;
 
 async fn get_code(pool: &DbPool, version: String) -> anyhow::Result<String> {
-    let code = sqlx::query!("SELECT * FROM script_version WHERE id = ?", version)
+    let v = version.replace("-", "");
+    let code = sqlx::query!("SELECT * FROM script_version WHERE id = ?", v)
         .fetch_one(pool)
         .await?;
     Ok(code.code_body)
@@ -443,7 +444,7 @@ pub fn rocket() -> _ {
     );
 
     let mut config = rocket::Config::debug_default();
-    config.port = 8080;
+    config.port = 8081;
 
     rocket::build()
         .configure(config)

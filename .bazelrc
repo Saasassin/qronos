@@ -1,4 +1,4 @@
-common --symlink_prefix=.bazel/
+# common --symlink_prefix=.bazel/
 common --enable_platform_specific_config
 
 # This fixes most of our cache issues
@@ -25,5 +25,9 @@ build:unix --action_env BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 
 build --strategy=Scalac=worker
 build --worker_sandboxing
+
+# C++ opts
+build --cxxopt=-std=c++20
+build --host_cxxopt=-std=c++20
 
 common --disk_cache=./.bazel-cache/bazel

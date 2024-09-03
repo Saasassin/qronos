@@ -1,7 +1,7 @@
 .DS_Store
 
 # ignore pycache
-__pycache__/ 
+__pycache__/
 
 .bazel/
 .metals/
@@ -17,6 +17,8 @@ dist/
 
 .*.venv/
 .venv/
+
+compile_commands.json
 
 target/
 rust-project.json

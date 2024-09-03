@@ -34,29 +34,6 @@ v8::Local<v8::Value> execModule(v8::Local<v8::Module> mod,
                                 v8::Local<v8::Context> cx,
                                 bool nsObject = false);
 
-void handlePromise(v8::Isolate *isolate, v8::Local<v8::Promise> promise) {
-  v8::Local<v8::Context> context = isolate->GetCurrentContext();
-
-  auto resolveHandler = [](const v8::FunctionCallbackInfo<v8::Value> &info) {
-    v8::Isolate *isolate = info.GetIsolate();
-    v8::String::Utf8Value str(isolate, info[0]);
-    printf("Promise resolved with: %s\n", *str);
-  };
-
-  auto rejectHandler = [](const v8::FunctionCallbackInfo<v8::Value> &info) {
-    v8::Isolate *isolate = info.GetIsolate();
-    v8::String::Utf8Value str(isolate, info[0]);
-    printf("Promise rejected with: %s\n", *str);
-  };
-
-  v8::Local<v8::Function> resolveFunction =
-      v8::Function::New(context, resolveHandler).ToLocalChecked();
-  v8::Local<v8::Function> rejectFunction =
-      v8::Function::New(context, rejectHandler).ToLocalChecked();
-
-  promise->Then(context, resolveFunction, rejectFunction).ToLocalChecked();
-}
-
 void JsPrint(const v8::FunctionCallbackInfo<v8::Value> &args) {
   for (int i = 0; i < args.Length(); i++) {
     v8::String::Utf8Value str(args.GetIsolate(), args[i]);
@@ -99,7 +76,7 @@ int main(int argc, char *argv[]) {
         loadModule(readFile(file_path), file_path, context).ToLocalChecked();
 
     module_paths[module->ScriptId()] = file_path;
-    auto result = execModule(checkModule(module, context), context, true);
+    auto result = execModule(checkModule(module, context), context);
 
     while (v8::platform::PumpMessageLoop(platform.get(), isolate))
       continue;

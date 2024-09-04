@@ -17,8 +17,15 @@ import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
 import { FaRegHourglass } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import { ScriptWithVersion } from "../../types/qronos";
-import { fetchScript, saveOrUpdateScript } from "../services/Client";
+import { Schedule, ScriptWithVersion } from "../../types/qronos";
+import { CronDiv } from "../core/cron";
+import {
+  deleteSchedule,
+  fetchSchedule,
+  fetchScript,
+  saveOrUpdateSchedule,
+  saveOrUpdateScript,
+} from "../services/Client";
 
 self.MonacoEnvironment = {
   getWorker(_, label) {
@@ -65,7 +72,7 @@ const EditScript = () => {
    * This is a callback function that is called when the editor is mounted.
    */
   const handleEditorDidMount = (mountedEditor: any, mountedMonaco: any) => {
-    console.log("editor mounted");
+    //console.log("editor mounted");
 
     editorRef.current = mountedEditor;
     monacoRef.current = mountedMonaco;
@@ -79,7 +86,7 @@ const EditScript = () => {
   };
 
   const handleEditorValidation = (markers: any) => {
-    console.log("markers: ", markers);
+    //console.log("markers: ", markers);
     // TODO: if markers.length > 0, display error alert before saving.
   };
 
@@ -114,6 +121,14 @@ const EditScript = () => {
         "// Welcome to Qronos script editor!\n\nfunction hello(foo: string) {\n\tconsole.log('Hello, ' + foo);\n}\n\nhello('world');\n",
       created_at: undefined,
     },
+  });
+
+  const [schedule, setSchedule] = useState<Schedule>({
+    id: undefined,
+    script_id: formData.script.id,
+    cron_expression: "",
+    created_at: undefined,
+    updated_at: undefined,
   });
 
   // initialize alert state
@@ -152,6 +167,21 @@ const EditScript = () => {
           //console.log("Creating Script");
           setPageTitle("Create Script");
           document.title = "Qronos | Create Script";
+        }
+      });
+
+      // fetch the schedule for this script
+      fetchSchedule(id).then((data) => {
+        if (data) {
+          setSchedule(data);
+        } else {
+          setSchedule({
+            id: undefined,
+            script_id: id,
+            cron_expression: "",
+            created_at: undefined,
+            updated_at: undefined,
+          });
         }
       });
     }
@@ -199,7 +229,7 @@ const EditScript = () => {
 
     event.preventDefault();
 
-    console.log("Submitting data: ", formData);
+    //console.log("Submitting data: ", formData);
 
     try {
       saveOrUpdateScript(formData).then(async (response) => {
@@ -210,6 +240,14 @@ const EditScript = () => {
             script: responseData.script,
             script_version: responseData.script_version,
           });
+
+          // toggle the button to be visible if the script is runnable
+          if (formData.script.script_type === "RUNNABLE") {
+            setIsCronable(true);
+          } else {
+            setIsCronable(false);
+          }
+
           displaySuccessAlert("Script Updated Successfully!");
         } else {
           displayErrorAlert("Script Save Error!" + response.statusText);
@@ -219,6 +257,45 @@ const EditScript = () => {
       displayErrorAlert("Script Persistence Error!");
       console.error("Error:", error);
     }
+  };
+
+  const saveCronFn = (new_cron_expression: string) => {
+    // close the drawer
+    const cronModal = document.getElementById(
+      "my-drawer-4"
+    ) as HTMLInputElement;
+    cronModal.checked = false;
+
+    if (new_cron_expression === "") {
+      displayErrorAlert("Cron Expression cannot be empty!");
+      return;
+    }
+
+    schedule.cron_expression = new_cron_expression;
+    saveOrUpdateSchedule(schedule);
+
+    displaySuccessAlert("Schedule Updated Successfully!");
+  };
+
+  const deleteCronFn = () => {
+    // close the drawer
+    const cronModal = document.getElementById(
+      "my-drawer-4"
+    ) as HTMLInputElement;
+    cronModal.checked = false;
+
+    deleteSchedule(formData.script.id || "");
+
+    displaySuccessAlert("Schedule Deleted Successfully!");
+  };
+
+  const showCronModal = () => {
+    // open the drawer to show the cron modal htmlFor="my-drawer-4"
+    const cronModal = document.getElementById(
+      "my-drawer-4"
+    ) as HTMLInputElement;
+
+    cronModal.checked = true;
   };
 
   return (
@@ -290,7 +367,7 @@ const EditScript = () => {
                     className={`btn btn-primary join-item ${
                       isCronable ? "" : "btn-disabled"
                     }`}
-                    onClick={() => {}}
+                    onClick={() => showCronModal()}
                   >
                     <IconContext.Provider
                       value={{ className: "react-icon-button" }}
@@ -387,6 +464,26 @@ const EditScript = () => {
           visible={alertVisible}
           onClose={() => setAlertVisible(false)}
         />
+        {/* BEGIN: CRON MODAL */}
+        <div className="drawer drawer-end">
+          <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
+          <div className="drawer-side">
+            <label
+              htmlFor="my-drawer-4"
+              aria-label="close sidebar"
+              className="drawer-overlay"
+            ></label>
+            <div className="menu bg-base-200 text-base-content min-h-full w-1/2 p-4 mt-16">
+              <CronDiv
+                saveCronFn={saveCronFn}
+                deleteCronFn={deleteCronFn}
+                script_name={formData.script.script_name || ""}
+                defaultValue={schedule?.cron_expression || ""}
+              />
+            </div>
+          </div>
+        </div>
+        {/* END: CRON MODAL */}
       </div>
     </>
   );

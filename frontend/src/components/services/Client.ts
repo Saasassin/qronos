@@ -64,6 +64,12 @@ export const deleteScript = async (id: string) => {
   return response;
 };
 
+export const fetchSchedule = async (script_id: string) => {
+  const response = await fetch(`${BASE_URI}/schedule/${script_id}`);
+  const data = await response.json();
+  return data;
+};
+
 export const saveOrUpdateSchedule = async (schedule: Schedule) => {
   const post_body = {
     id: schedule.id,

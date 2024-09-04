@@ -10,6 +10,13 @@ from sqlmodel import Session, select
 
 router = APIRouter()
 
+@router.get("/schedule/{script_id}", tags=["Schedule Methods"], response_model=ScriptSchedule | None)
+async def get_script_schedule(script_id: str, session: Session = Depends(get_session)):
+    """
+    Get a script schedule by script ID.
+    """
+    return session.exec(select(ScriptSchedule).where(ScriptSchedule.script_id == script_id)).first()
+
 @router.post("/schedule", tags=["Schedule Methods"], response_model=ScriptSchedule | None)
 async def create_script_schedule(script_schedule: ScriptSchedule, session: Session = Depends(get_session)):
     """

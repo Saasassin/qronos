@@ -60,17 +60,12 @@ class RunHistory(SQLModel, table=True, extend_existing=True):
     id: UUID = Field(default=None, primary_key=True)
     script_id: UUID = Field(default=None, foreign_key="script.id", nullable=False)
     script_version_id: UUID = Field(default=None, foreign_key="script_version.id", nullable=False)
-    stdout: str = Field(default=None, nullable=True)
-    stderr: str = Field(default=None, nullable=True)
-    started_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
-    finished_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc), nullable=True)
-    total_run_time_in_seconds: float = Field(default=None, nullable=True)
-
+    log_level : str = Field(default="INFO", nullable=False)
+    message: str = Field(default=None, nullable=True)
 
 class UserBase(SQLModel):
     email: str = Field(unique=True, nullable=False)
     password: str = Field(nullable=False)
-
 
 class User(UserBase, table=True):
     __table_args__ = {"extend_existing": True}

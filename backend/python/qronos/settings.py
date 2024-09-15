@@ -20,7 +20,11 @@ class Settings(BaseSettings):
 
 def attempt_chdir(env_path: str):
     try:
-        os.chdir(os.path.join(os.environ["BUILD_WORKSPACE_DIRECTORY"], os.path.dirname(env_path)))
+        os.chdir(
+            os.path.join(
+                os.environ["BUILD_WORKSPACE_DIRECTORY"], os.path.dirname(env_path)
+            )
+        )
         return os.path.basename(env_path)
     except Exception as e:
         logging.warning("Could not change directory to backend/python", exc_info=e)
@@ -34,12 +38,23 @@ def attempt_chdir(env_path: str):
     return env_path
 
 
+def rewrite_paths(settings: Settings):
+    url = settings.db_url
+    if url.startswith("sqlite"):
+        settings.db_url = "sqlite:///" + os.path.join(
+            os.environ["BUILD_WORKSPACE_DIRECTORY"],
+            "backend/python",
+            url.split("///")[1],
+        )
+
+    return settings
+
+
 if os.getenv("ENV") == "prod":
-    env_path = attempt_chdir("backend/python/.env.prod")
-    SETTINGS = Settings(_env_file=".env.prod", env=Env.prod)
+    SETTINGS = Settings(_env_file="backend/python/.env.prod", env=Env.prod)
 if os.getenv("ENV") == "test":
-    env_path = attempt_chdir("backend/python/.env.test")
-    SETTINGS = Settings(_env_file=env_path, env=Env.test)
+    SETTINGS = Settings(_env_file="backend/python/.env.test", env=Env.test)
 else:
-    env_path = attempt_chdir("backend/python/.env")
-    SETTINGS = Settings(_env_file=env_path, env=Env.dev)
+    SETTINGS = Settings(_env_file="backend/python/.env", env=Env.dev)
+
+rewrite_paths(SETTINGS)

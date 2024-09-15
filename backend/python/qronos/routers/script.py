@@ -1,30 +1,35 @@
 import uuid
-from uuid import UUID
-import sqlalchemy as sa
-from sqlalchemy import func
 
+import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from qronos.db import Script, ScriptPublic, ScriptVersion, ScriptSchedule, get_session
+from qronos.db import Script, ScriptPublic, ScriptVersion, get_session
+from sqlalchemy import func
 from sqlmodel import Session, select
 
 router = APIRouter()
+
 
 class ScriptWithVersion(BaseModel):
     """
     A model that combines a Script and its current ScriptVersion.
     """
+
     script: Script
     script_version: ScriptVersion
-   
+
+
 @router.get("/scripts", tags=["Script Methods"], response_model=list[ScriptPublic])
-async def read_scripts(session: Session = Depends(get_session), skip: int = 0, limit: int = 25, sort: str = "id", order: str = "ASC"):
+async def read_scripts(
+    session: Session = Depends(get_session), skip: int = 0, limit: int = 25, sort: str = "id", order: str = "ASC"
+):
     """
     Fetches all scripts with pagination and sorting.
     """
     statement = select(Script).offset(skip).limit(limit).order_by(sa.text("script." + sort + " " + order))
     results = session.exec(statement).all()
     return results
+
 
 @router.get("/scripts/count", tags=["Script Methods"], response_model=int)
 async def read_script_count(session: Session = Depends(get_session)):
@@ -34,14 +39,21 @@ async def read_script_count(session: Session = Depends(get_session)):
     statement = select(func.count(Script.id))
     return session.scalar(statement)
 
+
 @router.get("/scripts/{script_id}", tags=["Script Methods"], response_model=ScriptWithVersion)
 async def read_script(script_id: str, session: Session = Depends(get_session)):
     """
     Fetches a script by its ID with the current ScriptVersion.
     """
-    statement = select(Script, ScriptVersion).where(Script.id == script_id).join(ScriptVersion).where(ScriptVersion.id == Script.current_version_id)
+    statement = (
+        select(Script, ScriptVersion)
+        .where(Script.id == script_id)
+        .join(ScriptVersion)
+        .where(ScriptVersion.id == Script.current_version_id)
+    )
     [script, script_version] = session.exec(statement).first()
     return ScriptWithVersion(script=script, script_version=script_version)
+
 
 @router.post("/scripts", tags=["Script Methods"], response_model=ScriptWithVersion)
 async def create_script(script: Script, script_version: ScriptVersion, session: Session = Depends(get_session)):
@@ -60,6 +72,7 @@ async def create_script(script: Script, script_version: ScriptVersion, session: 
     session.refresh(script)
 
     return ScriptWithVersion(script=script, script_version=script_version)
+
 
 @router.put("/scripts/{script_id}", tags=["Script Methods"], response_model=ScriptWithVersion | None)
 async def update_script(

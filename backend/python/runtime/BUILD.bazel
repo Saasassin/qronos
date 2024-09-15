@@ -1,0 +1,12 @@
+load("@aspect_rules_py//py:defs.bzl", "py_library")
+
+py_library(
+    name = "runtime",
+    srcs = glob(["**/*.py"]),
+    data = ["bootstrap.mts"],
+    imports = [".."],
+    visibility = ["//backend/python:__subpackages__"],
+    deps = [
+        "@pip//fastapi",
+    ],
+)

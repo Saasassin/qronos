@@ -1,8 +1,7 @@
 from fastapi import FastAPI
-from fastapi.openapi.utils import get_openapi
-from backend.python.qronos.routers import schedule
-from qronos.routers import default, history, runner, script, settings, user
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.utils import get_openapi
+from qronos.routers import default, history, runner, runtime, schedule, script, settings, user
 
 tags_metadata = [
     {"name": "Runner Methods"},
@@ -32,6 +31,7 @@ def qronos_openapi_schema():
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
+
 # TODO: this needs to be an EVN var or something?
 origins = ["*"]
 
@@ -43,7 +43,10 @@ app.include_router(history.router)
 app.include_router(user.router)
 app.include_router(settings.router)
 app.include_router(default.router)
+app.include_router(runtime.router, prefix="/runtime")
 
+# TODO: We should disable this and reverse proxy through the UI's dev server.
+#       That will match more closely with how we deploy and eliminate the need for CORS.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,

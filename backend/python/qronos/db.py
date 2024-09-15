@@ -17,6 +17,7 @@ class ScriptType(str, enum.Enum):
     API = "API"
     RUNNABLE = "RUNNABLE"
 
+
 class ScriptBase(SQLModel):
     id: UUID = Field(default=None, primary_key=True)
     script_name: str = Field(unique=True, nullable=False)
@@ -25,18 +26,24 @@ class ScriptBase(SQLModel):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
     created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
 
+
 class Script(ScriptBase, table=True, extend_existing=True):
-    """ 
+    """
     This was added to support having a nested relationship in the ScriptPublic model with the script_schedule.
     """
+
     __tablename__ = "script"
     __table_args__ = {"extend_existing": True}
-    script_schedule : Optional["ScriptSchedule"] = Relationship(back_populates="script",sa_relationship_kwargs={"lazy": "joined"})
+    script_schedule: Optional["ScriptSchedule"] = Relationship(
+        back_populates="script", sa_relationship_kwargs={"lazy": "joined"}
+    )
+
 
 class ScriptPublic(ScriptBase):
     script_schedule: Optional["ScriptSchedule"]
 
-class ScriptSchedule(SQLModel, table=True, extend_existing=True):
+
+class ScriptSchedule(SQLModel, table=True):
     __tablename__ = "script_schedule"
     __table_args__ = {"extend_existing": True}
     id: UUID = Field(default=None, primary_key=True)
@@ -46,6 +53,7 @@ class ScriptSchedule(SQLModel, table=True, extend_existing=True):
     script_id: UUID = Field(default=None, foreign_key="script.id", nullable=False, unique=True)
     script: Optional["Script"] = Relationship(back_populates="script_schedule")
 
+
 class ScriptVersion(SQLModel, table=True, extend_existing=True):
     __tablename__ = "script_version"
     __table_args__ = {"extend_existing": True}
@@ -54,18 +62,21 @@ class ScriptVersion(SQLModel, table=True, extend_existing=True):
     script_id: UUID = Field(default=None, nullable=False)
     created_at: datetime = Field(default_factory=lambda: datetime.now(tz=timezone.utc))
 
+
 class RunHistory(SQLModel, table=True, extend_existing=True):
     __tablename__ = "run_history"
     __table_args__ = {"extend_existing": True}
     id: UUID = Field(default=None, primary_key=True)
     script_id: UUID = Field(default=None, foreign_key="script.id", nullable=False)
     script_version_id: UUID = Field(default=None, foreign_key="script_version.id", nullable=False)
-    log_level : str = Field(default="INFO", nullable=False)
+    log_level: str = Field(default="INFO", nullable=False)
     message: str = Field(default=None, nullable=True)
+
 
 class UserBase(SQLModel):
     email: str = Field(unique=True, nullable=False)
     password: str = Field(nullable=False)
+
 
 class User(UserBase, table=True):
     __table_args__ = {"extend_existing": True}

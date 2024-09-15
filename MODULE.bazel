@@ -23,6 +23,7 @@ bazel_dep(name = "rules_gzip", version = "1.0.0-beta.1")
 bazel_dep(name = "rules_uv", version = "0.14.0")
 bazel_dep(name = "rules_multirun", version = "0.9.0")
 bazel_dep(name = "zlib", version = "1.3.1")
+bazel_dep(name = "rules_foreign_cc", version = "0.12.0")
 # bazel_dep(name = "toolchains_protoc", version = "0.3.1")
 
 # protoc = use_extension("@toolchains_protoc//protoc:extensions.bzl", "protoc")
@@ -246,20 +247,40 @@ git_override(
 )
 
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# Had to downgrade cause of v8pp, need to revisit what the latest supported version is.
 http_archive(
     name = "v8_macos",
     urls = [
-        "https://github.com/kuoruan/libv8/releases/download/v12.8.374.24/v8_macOS_arm64.tar.xz",
+        # "https://github.com/kuoruan/libv8/releases/download/v12.8.374.24/v8_macOS_arm64.tar.xz",
+        "https://github.com/kuoruan/libv8/releases/download/v12.4.254.15/v8_macOS_arm64.tar.xz",
     ],
-    sha256 = "45a355d9948ec04926705dc7cbaa0e10be26d6f52c02808ed62a139437ec1ead",
+    # sha256 = "45a355d9948ec04926705dc7cbaa0e10be26d6f52c02808ed62a139437ec1ead",
+    sha256 = "c0c76f37c58177b57e9fcda15ff539b9ab10a4530ecc11666d6113b0ac421cd6",
+    build_file = "//third_party:BUILD.v8.bazel",
+)
+
+# Had to downgrade cause of v8pp, need to revisit what the latest supported version is.
+http_archive(
+    name = "v8_linux",
+    urls = [
+        # "https://github.com/kuoruan/libv8/releases/download/v12.8.374.24/v8_Linux_x64.tar.xz",
+        "https://github.com/kuoruan/libv8/releases/download/v12.4.254.15/v8_Linux_x64.tar.xz",
+    ],
+    # sha256 = "04209ad69bc45a221ab239d03be68cef6066bd3ec2b5caf06c36a3580c54ecda",
+    sha256 = "524c581a14be213ddfa815fd22ccc344be9f19cce9b5b56f37b4e558b7d94604",
     build_file = "//third_party:BUILD.v8.bazel",
 )
 
 http_archive(
-    name = "v8_linux",
+    name = "v8pp",
     urls = [
-        "https://github.com/kuoruan/libv8/releases/download/v12.8.374.24/v8_Linux_x64.tar.xz",
+        # "https://github.com/pmed/v8pp/archive/refs/tags/v2.1.1.tar.gz",
+        "https://github.com/pmed/v8pp/archive/5759d79d4ce996fc87944eccdff9ffc811c1cda0.zip",
     ],
-    sha256 = "04209ad69bc45a221ab239d03be68cef6066bd3ec2b5caf06c36a3580c54ecda",
-    build_file = "//third_party:BUILD.v8.bazel",
+    # sha256 = "ab6c6ce250b7f54d8c1cedde88ada98a5a8213aaa72d5f33801a81fb5d9a10da",
+    sha256 = "832996bf2e36917967acea0c40ac3a21504363a068023c5dd0549d36a5edf9c8",
+    # strip_prefix = "v8pp-2.1.1",
+    strip_prefix = "v8pp-5759d79d4ce996fc87944eccdff9ffc811c1cda0",
+    build_file = "//third_party:BUILD.v8pp.bazel",
 )

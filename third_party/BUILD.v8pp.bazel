@@ -1,0 +1,32 @@
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "srcs",
+    srcs = glob(["**"]),
+    visibility = ["//visibility:public"],
+)
+
+cmake(
+    name = "v8pp",
+    cache_entries = {
+        "V8_LIB": "$$EXT_BUILD_DEPS$$/lib",
+        "V8_LIBPLATFORM": "$$EXT_BUILD_DEPS$$/lib",
+        "V8_INCLUDE_DIRS": "$$EXT_BUILD_DEPS$$/include",
+        "V8PP_HEADER_ONLY": "1",
+        "BUILD_TESTING": "0",
+        "BUILD_SHARED_LIBS": "0",
+    },
+    lib_source = ":srcs",
+    out_headers_only = True,
+    deps = [
+        "@@//third_party:v8",
+    ],
+)
+
+# cc_library(
+#     name = "v8pp",
+#     hdrs = glob(["v8pp/**/*.hpp"]),
+#     deps = [],
+# )

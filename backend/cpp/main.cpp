@@ -1,6 +1,8 @@
 #include "libplatform/libplatform.h"
+#include "request.h"
 #include "v8-context.h"
 #include "v8.h"
+#include "v8pp/module.hpp"
 #include <cstdio>
 #include <iostream>
 
@@ -42,6 +44,42 @@ void JsPrint(const v8::FunctionCallbackInfo<v8::Value> &args) {
   printf("\n");
 }
 
+static void PrintMessageCallback(v8::Local<v8::Message> message,
+                                 v8::Local<v8::Value> error) {
+  switch (message->ErrorLevel()) {
+  case v8::Isolate::kMessageWarning:
+  case v8::Isolate::kMessageLog:
+  case v8::Isolate::kMessageInfo:
+  case v8::Isolate::kMessageDebug: {
+    break;
+  }
+
+  case v8::Isolate::kMessageError: {
+    message->PrintCurrentStackTrace(v8::Isolate::GetCurrent(), std::cerr);
+    return;
+  }
+
+  default: {
+    throw std::runtime_error("Unknown error level");
+  }
+  }
+  // Converts a V8 value to a C string.
+  auto ToCString = [](const v8::String::Utf8Value &value) {
+    return *value ? *value : "<string conversion failed>";
+  };
+  v8::Isolate *isolate = message->GetIsolate();
+  v8::String::Utf8Value msg(isolate, message->Get());
+  const char *msg_string = ToCString(msg);
+  // Print (filename):(line number): (message).
+  v8::String::Utf8Value filename(isolate,
+                                 message->GetScriptOrigin().ResourceName());
+  const char *filename_string = ToCString(filename);
+  v8::Maybe<int> maybeline =
+      message->GetLineNumber(isolate->GetCurrentContext());
+  int linenum = maybeline.IsJust() ? maybeline.FromJust() : -1;
+  printf("%s:%i: %s\n", filename_string, linenum, msg_string);
+}
+
 int main(int argc, char *argv[]) {
   v8::V8::InitializeICUDefaultLocation(argv[0]);
   v8::V8::InitializeExternalStartupData(argv[0]);
@@ -66,8 +104,15 @@ int main(int argc, char *argv[]) {
 
     v8::TryCatch try_catch(isolate);
 
+    isolate->AddMessageListenerWithErrorLevel(
+        PrintMessageCallback,
+        v8::Isolate::kMessageError | v8::Isolate::kMessageWarning |
+            v8::Isolate::kMessageLog | v8::Isolate::kMessageInfo |
+            v8::Isolate::kMessageDebug);
+
     auto global = v8::ObjectTemplate::New(isolate);
     global->Set(isolate, "print", v8::FunctionTemplate::New(isolate, JsPrint));
+    global->Set(isolate, "Request", Request::ClassTemplate(isolate));
 
     auto context = v8::Context::New(isolate, nullptr, global);
     v8::Context::Scope context_scope(context);
@@ -75,7 +120,7 @@ int main(int argc, char *argv[]) {
     auto module =
         loadModule(readFile(file_path), file_path, context).ToLocalChecked();
 
-    module_paths[module->ScriptId()] = file_path;
+    module_paths[module->GetIdentityHash()] = file_path;
     auto result = execModule(checkModule(module, context), context);
 
     while (v8::platform::PumpMessageLoop(platform.get(), isolate))
@@ -146,7 +191,7 @@ callResolve(v8::Local<v8::Context> context, v8::Local<v8::String> specifier,
   // Get module name from specifier (given name in import args)
   v8::String::Utf8Value str(context->GetIsolate(), specifier);
 
-  auto referring_path = module_paths[referrer->ScriptId()];
+  auto referring_path = module_paths[referrer->GetIdentityHash()];
   auto referring_dir = std::filesystem::path(referring_path).parent_path();
 
   auto full_path = referring_dir / *str;

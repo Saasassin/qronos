@@ -12,6 +12,11 @@
   "rust-analyzer.check.overrideCommand": [
     "./scripts/check.sh"
   ],
+  "clangd.arguments": [
+    "--header-insertion=never",
+    "--compile-commands-dir=${workspaceFolder}/",
+    "--query-driver=**",
+  ],
   "python.defaultInterpreterPath": "${workspaceFolder}/backend/python/.venv/bin/python",
   "black-formatter.args": [
     "--line-length",

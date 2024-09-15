@@ -12,3 +12,5 @@ import("./lib.mjs").then((module) => {
   print(a);
   print(b);
 });
+
+new Request().sayHello("Tim");

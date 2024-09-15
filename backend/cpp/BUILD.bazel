@@ -7,10 +7,23 @@ cc_binary(
         "lib.mjs",
         "main.js",
     ],
-    includes = [
-        "include",
+    deps = [
+        ":runtime",
+        "//third_party:v8",
+        "@v8pp",
+    ],
+)
+
+cc_library(
+    name = "runtime",
+    srcs = [
+        "request.cpp",
+    ],
+    hdrs = [
+        "request.h",
     ],
     deps = [
         "//third_party:v8",
+        "@v8pp",
     ],
 )

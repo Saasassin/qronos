@@ -44,6 +44,9 @@ jobs:
             v3-${{ matrix.os }}-bazel-refs/heads/main-
             v3-${{ matrix.os }}-bazel-
 
+      - name: Install libtinfo5
+        run: sudo apt-get install -y libtinfo5
+
       - name: Build all targets
         run: bazel build //...
 

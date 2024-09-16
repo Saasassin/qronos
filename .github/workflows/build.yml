@@ -14,11 +14,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-14]
+        os: [ubuntu-22.04, macos-14]
 
     steps:
       - name: Maximize build space
-        if: ${{ matrix.os == 'ubuntu-20.04' }}
+        if: ${{ matrix.os == 'ubuntu-22.04' }}
         shell: bash
         run: |
           df -h
@@ -38,11 +38,11 @@ jobs:
         with:
           path: |
             ./.bazel-cache/
-          key: v2-${{ matrix.os }}-bazel-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}-${{ github.run_id }}
+          key: v3-${{ matrix.os }}-bazel-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}-${{ github.run_id }}
           restore-keys: |
-            v2-${{ matrix.os }}-bazel-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}-
-            v2-${{ matrix.os }}-bazel-refs/heads/main-
-            v2-${{ matrix.os }}-bazel-
+            v3-${{ matrix.os }}-bazel-${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}-
+            v3-${{ matrix.os }}-bazel-refs/heads/main-
+            v3-${{ matrix.os }}-bazel-
 
       - name: Build all targets
         run: bazel build //...

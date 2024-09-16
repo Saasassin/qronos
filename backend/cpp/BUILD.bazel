@@ -7,6 +7,12 @@ cc_binary(
         "lib.mjs",
         "main.js",
     ],
+    target_compatible_with = select({
+        "@platforms//os:macos": ["@platforms//cpu:arm64"],
+        # Experiencing weird linking bugs with the prebuild v8 lib we're downloading.
+        # Will have to look into later when we need this.
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         # ":runtime",
         "//third_party:v8",

@@ -8,22 +8,22 @@ cc_binary(
         "main.js",
     ],
     deps = [
-        ":runtime",
+        # ":runtime",
         "//third_party:v8",
         "@v8pp",
     ],
 )
 
-cc_library(
-    name = "runtime",
-    srcs = [
-        "request.cpp",
-    ],
-    hdrs = [
-        "request.h",
-    ],
-    deps = [
-        "//third_party:v8",
-        "@v8pp",
-    ],
-)
+# cc_library(
+#     name = "runtime",
+#     srcs = [
+#         "request.cpp",
+#     ],
+#     hdrs = [
+#         "request.h",
+#     ],
+#     deps = [
+#         "//third_party:v8",
+#         "@v8pp",
+#     ],
+# )

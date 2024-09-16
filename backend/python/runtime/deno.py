@@ -3,7 +3,6 @@ import logging
 import os
 import shutil
 import subprocess
-import sys
 import tempfile
 from pathlib import Path
 
@@ -23,16 +22,17 @@ async def run_script(deno_path: str, script: str, request: Request) -> Response:
         "method": method,
         "headers": headers,
         "url": url,
+        # TODO: This is bad, the body should be treated as opaque bytes
         "body": body.decode("utf-8") if body else None,
     }
 
+    # Also sucks, would be nice to serialize as binary, maybe could look into protobuf/msgpack or something.
     request_json = json.dumps(request_data)
 
     with tempfile.TemporaryDirectory() as dir:
         shutil.copy("backend/python/runtime/bootstrap.mts", dir)
         Path(os.path.join(dir, "script.ts")).write_text(script)
 
-        # Command to execute Deno with limited permissions
         command = [
             deno_path,
             "run",
@@ -41,7 +41,6 @@ async def run_script(deno_path: str, script: str, request: Request) -> Response:
         ]
 
         try:
-            # Execute the Deno script
             result = subprocess.run(
                 command,
                 input=request_json.encode("utf-8"),
@@ -76,6 +75,7 @@ async def run_script(deno_path: str, script: str, request: Request) -> Response:
         # Construct the HTTP response
         status = response_data.get("status", 200)
         headers = response_data.get("headers", {})
+        # Also should not be assumed to be string
         body = response_data.get("body", "")
 
         return Response(content=body, status_code=status, headers=headers)

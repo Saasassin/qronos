@@ -15,7 +15,9 @@ bazel_dep(name = "aspect_bazel_lib", version = "2.7.7")
 bazel_dep(name = "platforms", version = "0.0.10")
 bazel_dep(name = "rules_pkg", version = "0.10.1")
 bazel_dep(name = "aspect_rules_py", version = "0.7.3")
-bazel_dep(name = "rules_python", dev_dependency = True, version = "0.33.1")
+
+bazel_dep(name = "rules_python", version = "0.33.1", dev_dependency = True)
+
 bazel_dep(name = "rules_python_gazelle_plugin", version = "0.33.1")
 bazel_dep(name = "gazelle", version = "0.37.0", repo_name = "bazel_gazelle")
 bazel_dep(name = "rules_gzip", version = "1.0.0-beta.1")
@@ -24,6 +26,7 @@ bazel_dep(name = "rules_multirun", version = "0.9.0")
 bazel_dep(name = "zlib", version = "1.3.1")
 bazel_dep(name = "rules_foreign_cc", version = "0.12.0")
 bazel_dep(name = "aspect_rules_lint", version = "1.0.1")
+bazel_dep(name = "buildifier_prebuilt", version = "7.3.1")
 # bazel_dep(name = "toolchains_protoc", version = "0.3.1")
 
 # protoc = use_extension("@toolchains_protoc//protoc:extensions.bzl", "protoc")
@@ -49,8 +52,8 @@ use_repo(
     third_party,
     "deno_aarch64-apple-darwin",
     "deno_x86_64-unknown-linux-gnu",
-    "v8_macos",
     "v8_linux",
+    "v8_macos",
     "v8pp",
 )
 
@@ -93,7 +96,6 @@ use_repo(pnpm, "pnpm")
 # OCI Section
 
 oci = use_extension("@rules_oci//oci:extensions.bzl", "oci")
-
 oci.pull(
     name = "bookworm_slim",
     digest = "sha256:67f3931ad8cb1967beec602d8c0506af1e37e8d73c2a0b38b181ec5d8560d395",
@@ -106,7 +108,6 @@ oci.pull(
         "linux/s390x",
     ],
 )
-
 oci.pull(
     name = "distroless_base",
     digest = "sha256:786007f631d22e8a1a5084c5b177352d9dcac24b1e8c815187750f70b24a9fc6",
@@ -119,7 +120,6 @@ oci.pull(
         "linux/s390x",
     ],
 )
-
 oci.pull(
     name = "graalvm_22_oci",
     digest = "sha256:bfe024278c3189370950e19e1c6bc9048b93f0655ab32c5914e514e745875560",
@@ -129,7 +129,6 @@ oci.pull(
         "linux/arm64",
     ],
 )
-
 use_repo(oci, "bookworm_slim")
 use_repo(oci, "distroless_base")
 use_repo(oci, "graalvm_22_oci")
@@ -139,26 +138,24 @@ use_repo(oci, "graalvm_22_oci")
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
     configure_coverage_tool = True,
-    python_version = "3.12",
     is_default = True,
+    python_version = "3.12",
 )
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
-
 pip.parse(
     hub_name = "pip",
     python_version = "3.12",
     requirements_darwin = "//backend/python:requirements_darwin.txt",
     requirements_linux = "//backend/python:requirements_linux.txt",
 )
-
 use_repo(pip, "pip")
 
 bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
 git_override(
     module_name = "hedron_compile_commands",
-    remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
     commit = "1e08f8e0507b6b6b1f4416a9a22cf5c28beaba93",
+    remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
     # Replace the commit hash (above) with the latest (https://github.com/hedronvision/bazel-compile-commands-extractor/commits/main).
     # Even better, set up Renovate and let it do the work for you (see "Suggestion: Updates" in the README).
 )

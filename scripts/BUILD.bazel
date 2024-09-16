@@ -24,6 +24,7 @@ format_multirun(
     javascript = ":prettier",
     markdown = ":prettier",
     sql = ":prettier",
+    starlark = "@buildifier_prebuilt//:buildifier",
 )
 
 format_test(
@@ -37,5 +38,6 @@ format_test(
     markdown = ":prettier",
     no_sandbox = True,
     sql = ":prettier",
+    starlark = "@buildifier_prebuilt//:buildifier",
     workspace = "//:.bazelversion",
 )

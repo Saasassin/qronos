@@ -1,10 +1,10 @@
 import enum
 from datetime import datetime, timezone
-from typing import Literal, Optional
+from typing import Optional
 from uuid import UUID
 
 from qronos.settings import SETTINGS, Env
-from sqlmodel import JSON, Column, Enum, Field, Relationship, Session, SQLModel, create_engine
+from sqlmodel import Column, Enum, Field, Relationship, Session, SQLModel, StaticPool, create_engine
 
 
 class ScriptType(str, enum.Enum):

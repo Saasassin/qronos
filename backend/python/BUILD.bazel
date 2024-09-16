@@ -74,7 +74,13 @@ py_test(
     srcs = glob(["test/**/*.py"]) + [
         ":__test__",
     ],
-    data = [".env.test"],
+    data = [
+        ".env.test",
+        "//third_party:deno_cli",
+    ],
+    env = {
+        "DENO_CLI_PATH": "$(location //third_party:deno_cli)",
+    },
     main = ":__test__.py",
     visibility = ["//backend/python:__subpackages__"],
     deps = [

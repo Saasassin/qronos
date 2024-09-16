@@ -1,5 +1,5 @@
 #include "libplatform/libplatform.h"
-#include "request.h"
+// #include "request.h"
 #include "v8-context.h"
 #include "v8.h"
 #include "v8pp/module.hpp"
@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
 
     auto global = v8::ObjectTemplate::New(isolate);
     global->Set(isolate, "print", v8::FunctionTemplate::New(isolate, JsPrint));
-    global->Set(isolate, "Request", Request::ClassTemplate(isolate));
+    // global->Set(isolate, "Request", Request::ClassTemplate(isolate));
 
     auto context = v8::Context::New(isolate, nullptr, global);
     v8::Context::Scope context_scope(context);

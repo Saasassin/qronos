@@ -1,0 +1,15 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library", "py_pytest_main", "py_test", "py_venv")
+load("@pip//:requirements.bzl", "all_requirements", "all_whl_requirements")
+load("@rules_multirun//:defs.bzl", "multirun")
+load("@rules_uv//uv:pip.bzl", "pip_compile")
+load("//bazel:python.bzl", "py_setup_gazelle")
+
+py_library(
+    name = "scheduler",
+    srcs = glob(["*.py"]),
+    visibility = ["//backend/python:__subpackages__"],
+    deps = [
+        "//backend/python/qronos",
+        "@pip//pydantic",
+    ],
+)

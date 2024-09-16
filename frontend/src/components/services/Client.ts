@@ -3,7 +3,7 @@ import { Schedule, ScriptWithVersion } from "../../types/qronos";
 const BASE_URI = import.meta.env.QRONOS_API_URL || "http://?????????????"; // TODO: Fill in the correct URL for default
 
 export const saveOrUpdateScript = async (
-  script_with_version: ScriptWithVersion
+  script_with_version: ScriptWithVersion,
 ) => {
   const post_body = {
     script: {
@@ -36,10 +36,10 @@ export const fetchScripts = async (
   limit: number = 25,
   skip: number = 0,
   sortby: string,
-  sortDirection: string = "DESC"
+  sortDirection: string = "DESC",
 ) => {
   const response = await fetch(
-    `${BASE_URI}/scripts?limit=${limit}&skip=${skip}&sort=${sortby}&order=${sortDirection}`
+    `${BASE_URI}/scripts?limit=${limit}&skip=${skip}&sort=${sortby}&order=${sortDirection}`,
   );
   const data = await response.json();
   return data;

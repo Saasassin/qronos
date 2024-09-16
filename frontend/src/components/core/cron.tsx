@@ -18,7 +18,7 @@ export function useCronReducer(defaultValue: string): [
   Dispatch<{
     type: "set_cron_value" | "set_input_value" | "set_values";
     value: string;
-  }>
+  }>,
 ] {
   // reset prevValues to "" when defaultValue changes
   const [prevValues, setPrevValues] = useState<{
@@ -38,7 +38,7 @@ export function useCronReducer(defaultValue: string): [
       action: {
         type: "set_cron_value" | "set_input_value" | "set_values";
         value: string;
-      }
+      },
     ) => {
       switch (action.type) {
         case "set_cron_value":
@@ -61,7 +61,7 @@ export function useCronReducer(defaultValue: string): [
     {
       inputValue: defaultValue,
       cronValue: defaultValue,
-    }
+    },
   );
 
   useEffect(() => {

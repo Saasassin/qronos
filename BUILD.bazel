@@ -4,6 +4,16 @@ load("@npm//:defs.bzl", "npm_link_all_packages")
 
 exports_files([".bazelversion"])
 
+[
+    alias(
+        name = script,
+        actual = "//scripts:" + script,
+    )
+    for script in [
+        "format",
+    ]
+]
+
 npm_link_all_packages()
 
 # Our gazelle target points to the python gazelle binary.

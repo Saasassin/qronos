@@ -1,12 +1,41 @@
-# load("@aspect_rules_lint//format:defs.bzl", "format_multirun", "format_test")
+load("@aspect_rules_lint//format:defs.bzl", "format_multirun", "format_test")
+load("@npm//:prettier/package_json.bzl", prettier = "bin")
 
-# format_multirun(
-#     name = "format",
-# )
+package(default_visibility = ["//visibility:public"])
 
-# format_test(
-#     name = "format_test",
-#     no_sandbox = True,
+prettier.prettier_binary(
+    name = "prettier",
+    # Allow the binary to be run outside bazel
+    env = {"BAZEL_BINDIR": "."},
+    # default log level is "log" which spams on success
+    # https://prettier.io/docs/en/cli.html#--log-level
+    # NB: prettier 2 names this loglevel, in prettier 3 it's renamed log-level, see
+    # https://prettier.io/blog/2023/07/05/3.0.0.html#cli-1
+    fixed_args = ["--log-level=warn"],
+)
 
-#     workspace = "//:.bazelversion",
-# )
+format_multirun(
+    name = "format",
+    c = "@llvm_toolchain_llvm//:bin/clang-format",
+    cc = "@llvm_toolchain_llvm//:bin/clang-format",
+    css = ":prettier",
+    graphql = ":prettier",
+    html = ":prettier",
+    javascript = ":prettier",
+    markdown = ":prettier",
+    sql = ":prettier",
+)
+
+format_test(
+    name = "format_test",
+    c = "@llvm_toolchain_llvm//:bin/clang-format",
+    cc = "@llvm_toolchain_llvm//:bin/clang-format",
+    css = ":prettier",
+    graphql = ":prettier",
+    html = ":prettier",
+    javascript = ":prettier",
+    markdown = ":prettier",
+    no_sandbox = True,
+    sql = ":prettier",
+    workspace = "//:.bazelversion",
+)

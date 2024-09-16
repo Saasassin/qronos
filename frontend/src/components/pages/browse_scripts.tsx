@@ -41,7 +41,7 @@ const BrowseTable = () => {
   const saveCronFn = (new_cron_expression: string) => {
     // close the drawer
     const cronModal = document.getElementById(
-      "my-drawer-4"
+      "my-drawer-4",
     ) as HTMLInputElement;
     cronModal.checked = false;
 
@@ -68,7 +68,7 @@ const BrowseTable = () => {
   const deleteCronFn = () => {
     // close the drawer
     const cronModal = document.getElementById(
-      "my-drawer-4"
+      "my-drawer-4",
     ) as HTMLInputElement;
     cronModal.checked = false;
 
@@ -208,7 +208,7 @@ const BrowseTable = () => {
         tableInstance.getState().pagination.pageSize *
           tableInstance.getState().pagination.pageIndex,
         sortState[0].id,
-        sortDirection
+        sortDirection,
       ).then((data) => {
         setData(data);
       });
@@ -238,7 +238,7 @@ const BrowseTable = () => {
   const showCronModal = (script_id: string = "") => {
     //find the script in the list 'scripts' and set it as selected for cron_edit
     const script = data.find(
-      (script: { id: string }) => script.id === script_id
+      (script: { id: string }) => script.id === script_id,
     );
     if (script) {
       setSelectedForCronEdit(script);
@@ -247,7 +247,7 @@ const BrowseTable = () => {
 
     // open the drawer to show the cron modal htmlFor="my-drawer-4"
     const cronModal = document.getElementById(
-      "my-drawer-4"
+      "my-drawer-4",
     ) as HTMLInputElement;
 
     cronModal.checked = true;
@@ -255,13 +255,13 @@ const BrowseTable = () => {
 
   const showDeleteModal = (script_id: string = "") => {
     const deleteModal = document.getElementById(
-      "delete_modal"
+      "delete_modal",
     ) as HTMLDialogElement;
     deleteModal?.showModal();
 
     //find the script in the list 'scripts' and set it as selected for delete
     const script = data.find(
-      (script: { id: string }) => script.id === script_id
+      (script: { id: string }) => script.id === script_id,
     );
     if (script) {
       setSelectedForDelete(script);
@@ -270,7 +270,7 @@ const BrowseTable = () => {
 
   const confirmDeleteScript = (script_id: string) => {
     const deleteModal = document.getElementById(
-      "delete_modal"
+      "delete_modal",
     ) as HTMLDialogElement;
     deleteModal?.close();
 
@@ -301,7 +301,7 @@ const BrowseTable = () => {
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                     {{
                       asc: (
@@ -384,7 +384,7 @@ const BrowseTable = () => {
               className="btn btn-error"
               onClick={() =>
                 confirmDeleteScript(
-                  selectedForDelete?.id ? selectedForDelete.id : ""
+                  selectedForDelete?.id ? selectedForDelete.id : "",
                 )
               }
             >

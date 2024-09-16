@@ -262,7 +262,7 @@ const EditScript = () => {
   const saveCronFn = (new_cron_expression: string) => {
     // close the drawer
     const cronModal = document.getElementById(
-      "my-drawer-4"
+      "my-drawer-4",
     ) as HTMLInputElement;
     cronModal.checked = false;
 
@@ -280,7 +280,7 @@ const EditScript = () => {
   const deleteCronFn = () => {
     // close the drawer
     const cronModal = document.getElementById(
-      "my-drawer-4"
+      "my-drawer-4",
     ) as HTMLInputElement;
     cronModal.checked = false;
 
@@ -292,7 +292,7 @@ const EditScript = () => {
   const showCronModal = () => {
     // open the drawer to show the cron modal htmlFor="my-drawer-4"
     const cronModal = document.getElementById(
-      "my-drawer-4"
+      "my-drawer-4",
     ) as HTMLInputElement;
 
     cronModal.checked = true;

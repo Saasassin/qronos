@@ -1,8 +1,13 @@
 import { generateSlug } from "random-word-slugs";
 import { IconContext } from "react-icons";
 
-import { IoInformationCircleOutline } from "react-icons/io5";
+import { FaExternalLinkAlt, FaRegCopy } from "react-icons/fa";
+import {
+  IoEllipsisHorizontalOutline,
+  IoInformationCircleOutline,
+} from "react-icons/io5";
 import { VscOpenPreview, VscSave } from "react-icons/vsc";
+
 import AlertComponent, { AlertType } from "../core/alert";
 
 import Editor, { loader } from "@monaco-editor/react";
@@ -15,11 +20,13 @@ import cssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
 import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
 import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
-import { FaRegHourglass } from "react-icons/fa";
+import { FaRegChartBar, FaRegHourglass } from "react-icons/fa";
+import { RiDeleteBinLine } from "react-icons/ri";
 import { useParams } from "react-router-dom";
 import { Schedule, ScriptWithVersion } from "../../types/qronos";
 import { CronDiv } from "../core/cron";
 import {
+  BASE_URI,
   deleteSchedule,
   fetchSchedule,
   fetchScript,
@@ -145,6 +152,13 @@ const EditScript = () => {
   // initialize page header state
   const [pageTitle, setPageTitle] = useState("Create Script");
 
+  const [httpEndpoint, setHttpEndpoint] = useState<string>("");
+
+  const copyURLToClipboard = () => {
+    navigator.clipboard.writeText(httpEndpoint);
+    displaySuccessAlert("URL Copied to Clipboard!");
+  };
+
   const { id } = useParams();
 
   const cron_tooltip = isCronable ? "Schedule" : "Not a Runnable Script";
@@ -184,6 +198,12 @@ const EditScript = () => {
           });
         }
       });
+
+      // fetch the http endpoint for
+      // FIXME: this URL needs to be taken from the config
+      if (!isCronable) {
+        setHttpEndpoint(BASE_URI + "/runtime/scripts/" + id);
+      }
     }
   }, [id]);
 
@@ -262,7 +282,7 @@ const EditScript = () => {
   const saveCronFn = (new_cron_expression: string) => {
     // close the drawer
     const cronModal = document.getElementById(
-      "my-drawer-4",
+      "my-drawer-4"
     ) as HTMLInputElement;
     cronModal.checked = false;
 
@@ -280,7 +300,7 @@ const EditScript = () => {
   const deleteCronFn = () => {
     // close the drawer
     const cronModal = document.getElementById(
-      "my-drawer-4",
+      "my-drawer-4"
     ) as HTMLInputElement;
     cronModal.checked = false;
 
@@ -292,7 +312,7 @@ const EditScript = () => {
   const showCronModal = () => {
     // open the drawer to show the cron modal htmlFor="my-drawer-4"
     const cronModal = document.getElementById(
-      "my-drawer-4",
+      "my-drawer-4"
     ) as HTMLInputElement;
 
     cronModal.checked = true;
@@ -361,10 +381,58 @@ const EditScript = () => {
             </div>
             <div className="sm:col-span-1">
               <div className="join float-right mr-5">
+                <div className="tooltip" data-tip="Script Options">
+                  <div className="dropdown dropdown-hover join-item">
+                    <div tabIndex={0} role="button" className="btn join-item ">
+                      <IconContext.Provider
+                        value={{ className: "react-icon-button" }}
+                      >
+                        <IoEllipsisHorizontalOutline />
+                      </IconContext.Provider>
+                    </div>
+                    <ul
+                      tabIndex={0}
+                      className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+                    >
+                      {!isCronable && (
+                        <>
+                          <li>
+                            <a
+                              onClick={() =>
+                                window.open(httpEndpoint, "_blank")
+                              }
+                            >
+                              <FaExternalLinkAlt />
+                              Open URL
+                            </a>
+                          </li>
+                          <li>
+                            <a onClick={copyURLToClipboard}>
+                              <FaRegCopy />
+                              Copy URL
+                            </a>
+                          </li>
+                        </>
+                      )}
+                      <li>
+                        <a>
+                          <FaRegChartBar />
+                          Logs
+                        </a>
+                      </li>
+                      <li>
+                        <a>
+                          <RiDeleteBinLine />
+                          Delete
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
                 <div className="tooltip" data-tip={`${cron_tooltip}`}>
                   <button
                     type="button"
-                    className={`btn btn-primary join-item ${
+                    className={`btn  join-item ${
                       isCronable ? "" : "btn-disabled"
                     }`}
                     onClick={() => showCronModal()}
@@ -398,7 +466,6 @@ const EditScript = () => {
                   </IconContext.Provider>
                   Preview
                 </button>
-                
               </div>
             </div>
 
@@ -456,7 +523,6 @@ const EditScript = () => {
                 </IconContext.Provider>
                 Preview
               </button>
-              
             </div>
           </div>
         </form>

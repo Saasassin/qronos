@@ -8,6 +8,7 @@ tags_metadata = [
     {"name": "Schedule Methods"},
     {"name": "Script Methods"},
     {"name": "Run History Methods"},
+    {"name": "Runtime Methods"},
     {"name": "User Methods"},
     {"name": "Settings Methods"},
     {"name": "Default Methods"},
@@ -40,10 +41,10 @@ app.include_router(script.router)
 app.include_router(schedule.router)
 app.include_router(runner.router)
 app.include_router(history.router)
+app.include_router(runtime.router, prefix="/runtime")
 app.include_router(user.router)
 app.include_router(settings.router)
 app.include_router(default.router)
-app.include_router(runtime.router, prefix="/runtime")
 
 # TODO: We should disable this and reverse proxy through the UI's dev server.
 #       That will match more closely with how we deploy and eliminate the need for CORS.

@@ -18,7 +18,7 @@ export default async function handleRequest(request) {
 
 
 @router.api_route(
-    "/scripts/{script_id}/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"]
+    "/scripts/{script_id}/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"], tags=["Runtime Methods"]
 )
 async def proxy(request: Request, script_id: str, session: Session = Depends(get_session)):
     statement = (

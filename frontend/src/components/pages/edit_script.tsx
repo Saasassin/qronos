@@ -376,14 +376,6 @@ const EditScript = () => {
                     </IconContext.Provider>
                   </button>
                 </div>
-                <button className="btn join-item">
-                  <IconContext.Provider
-                    value={{ className: "react-icon-button" }}
-                  >
-                    <VscOpenPreview />
-                  </IconContext.Provider>
-                  Preview
-                </button>
                 <button
                   type="button"
                   className={`btn btn-primary join-item ${
@@ -398,6 +390,15 @@ const EditScript = () => {
                   </IconContext.Provider>
                   Save
                 </button>
+                <button className="btn join-item">
+                  <IconContext.Provider
+                    value={{ className: "react-icon-button" }}
+                  >
+                    <VscOpenPreview />
+                  </IconContext.Provider>
+                  Preview
+                </button>
+                
               </div>
             </div>
 
@@ -432,14 +433,6 @@ const EditScript = () => {
 
           <div className="sm:col-span-1 mt-5">
             <div className="join float-right mr-5">
-              <button className="btn join-item">
-                <IconContext.Provider
-                  value={{ className: "react-icon-button" }}
-                >
-                  <VscOpenPreview />
-                </IconContext.Provider>
-                Preview
-              </button>
               <button
                 type="button"
                 className={`btn btn-primary join-item ${
@@ -455,6 +448,15 @@ const EditScript = () => {
                 </IconContext.Provider>
                 Save
               </button>
+              <button className="btn join-item">
+                <IconContext.Provider
+                  value={{ className: "react-icon-button" }}
+                >
+                  <VscOpenPreview />
+                </IconContext.Provider>
+                Preview
+              </button>
+              
             </div>
           </div>
         </form>

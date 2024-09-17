@@ -12,6 +12,8 @@ It is built using [Vite](https://vitejs.dev) and [React](https://reactjs.org) wi
 - Run `pnpm run dev` to start the development server
 - Open [http://localhost:4000](http://localhost:4000) in your browser
 
+The steps above will start the development server, but you will need to start the API to interact with the frontend. See the [backend README](../backend/python/README.md) for instructions on how to start the API.
+
 ### Developer Notes:
 
 Some handy VCSode extensions:
